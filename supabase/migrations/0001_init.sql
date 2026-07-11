@@ -90,7 +90,7 @@ alter table chat_conversations enable row level security;
 alter table chat_messages enable row level security;
 alter table credit_ledger enable row level security;
 
-create policy ws_select on workspaces for select using (is_member(id));
+create policy ws_select on workspaces for select using (owner_id = auth.uid() or is_member(id));
 create policy ws_insert on workspaces for insert with check (owner_id = auth.uid());
 create policy ws_update on workspaces for update using (owner_id = auth.uid());
 
