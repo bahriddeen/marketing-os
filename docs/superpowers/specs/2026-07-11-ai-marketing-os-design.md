@@ -20,7 +20,7 @@ The original TZ was a good product vision but not yet a technical requirement. T
 | # | Original | Corrected | Why |
 |---|----------|-----------|-----|
 | 1 | One company per user (implied) | **Workspaces with multiple brands** + team seats | The agency use case ("Vetline uchun…", "Mega Star uchun…") requires it; it's the $149 tier |
-| 2 | No language strategy | **Uzbek (Latin) + Russian** content generation, selectable per generation; UI in Uzbek | Real Uzbekistan SMM market posts in both |
+| 2 | No language strategy | **Uzbek (Latin) only** — UI and all generated content | Founder decision: product is for Uzbeks; no per-request language selection needed |
 | 3 | Unlimited generations (implied) | **Weighted credit system per tier** | Every generation costs LLM tokens; $29/mo unlimited loses money |
 | 4 | No payment mechanism | **Manual activation first** (admin panel + Payme transfer), Payme/Click API post-launch | Stripe unavailable in UZ; don't block launch on merchant paperwork |
 | 5 | Competitor Analyzer auto-scrapes IG/Telegram | **v1.1: paste-in analysis** (user pastes competitor posts/stats, AI analyzes) | Scraping violates ToS and breaks constantly; official APIs don't expose competitor data |
@@ -40,7 +40,7 @@ The original TZ was a good product vision but not yet a technical requirement. T
 |-------|--------|-------|
 | Framework | **Next.js (App Router) + TypeScript** | One codebase, one language |
 | DB / Auth / Storage | **Supabase** (Postgres, Row Level Security, Supabase Auth) | Free tier covers MVP; email+password and Google login |
-| AI | **Anthropic API, `claude-opus-4-8`** via `@anthropic-ai/sdk` | Best Uzbek/Russian quality; adaptive thinking; streaming; structured outputs; prompt caching on brand context |
+| AI | **Anthropic API, `claude-opus-4-8`** via `@anthropic-ai/sdk` | Best Uzbek quality; adaptive thinking; streaming; structured outputs; prompt caching on brand context |
 | UI | Tailwind CSS + shadcn/ui | Fast to build, looks professional |
 | Excel export | `exceljs` | Server-side .xlsx generation |
 | Hosting | Vercel | Zero-ops deploys |
@@ -55,7 +55,7 @@ workspace_members workspace_id, user_id, role (owner|member)
 brands            id, workspace_id, name, industry, products (jsonb),
                   services (jsonb), usp, target_audience (jsonb),
                   competitors (jsonb), tone_of_voice, brand_values,
-                  default_language (uz|ru), created_at, updated_at
+                  created_at, updated_at
 generations       id, workspace_id, brand_id, user_id, module
                   (content_plan|reels|copy|chat), input (jsonb),
                   output (jsonb), model, input_tokens, output_tokens,
@@ -86,27 +86,27 @@ Key implementation rules:
 - **Prompt caching:** brand context + module instructions form the stable prefix with `cache_control: {type: "ephemeral"}`; user input goes after. Cuts input cost ~90% for a user's repeated generations.
 - **Structured outputs** (`output_config.format` with JSON schema) for Content Planner and Reels — guarantees parseable output for tables and Excel export.
 - **Streaming** for chat and long generations (30-day plans) — UI shows progress.
-- **Language:** every generation request carries `language: "uz" | "ru"`; the system prompt instructs native-quality output in that language (not translated-sounding).
+- **Language:** all output is Uzbek (Latin). Every module's system prompt instructs native-quality Uzbek (not translated-sounding), using the marketing register real Uzbek SMM uses.
 - **Token logging:** store usage from every response — this is how we validate unit economics in week one.
 
 ## 6. Module Specifications (MVP)
 
 ### 6.1 Brand Knowledge Base
-- CRUD for brands within a workspace. Form sections: company, products/services, USP, target audience (segments), competitors, tone of voice, brand values, default language.
+- CRUD for brands within a workspace. Form sections: company, products/services, USP, target audience (segments), competitors, tone of voice, brand values.
 - Guided onboarding: user can paste free-form company description → AI pre-fills the structured fields (one cheap generation, big onboarding win).
 - Brand limit by plan (§9).
 
 ### 6.2 Content Planner
-- **Input:** brand, platform (Instagram/Telegram/both), goal (awareness/engagement/sales), post count (up to 30), month/period, language.
+- **Input:** brand, platform (Instagram/Telegram/both), goal (awareness/engagement/sales), post count (up to 30), month/period.
 - **Output (structured):** table of posts — date, topic, format (post/carousel/reels/story), hook, CTA, goal of the post.
 - **Export:** .xlsx and CSV. Plans are saved and re-openable.
 
 ### 6.3 Reels Scenario Generator
-- **Input:** brand, topic, product/service, goal, language.
+- **Input:** brand, topic, product/service, goal.
 - **Output:** 3 variants (Expert / Emotional / Sales), each with: hook (first 3 seconds), shot-by-shot scenes, voiceover text, caption, CTA, suggested duration.
 
 ### 6.4 Copywriting Generator
-- **Input:** brand, type (Instagram caption / Telegram post / ad copy / landing section / SMS / push), topic or offer, style (formal / sales / premium / friendly), language.
+- **Input:** brand, type (Instagram caption / Telegram post / ad copy / landing section / SMS / push), topic or offer, style (formal / sales / premium / friendly).
 - **Output:** 2–3 alternatives per request; SMS/push respect length limits (SMS ≤ 160 chars per segment guidance).
 
 ### 6.5 AI Marketing Assistant Chat
@@ -130,7 +130,7 @@ Worst-case COGS stays under ~35% of subscription price at the limits below. Vali
 
 ## 8. Non-Functional Requirements
 
-- **Languages:** UI in Uzbek (Latin); generated content in Uzbek or Russian per request. (Russian UI: post-MVP.)
+- **Language:** UI and all generated content in Uzbek (Latin) only.
 - **Security:** RLS on all tables; Anthropic key server-side only; no cross-workspace data leakage.
 - **Rate limiting:** per-user request throttle on generation endpoints (protects both API bill and abuse).
 - **Refusal/error handling:** generation failures never eat credits; user sees a retry option.
@@ -173,7 +173,7 @@ MVP payment flow: user picks a plan → sees Payme transfer instructions → adm
 
 ## 12. Risks
 
-1. **Uzbek output quality** — biggest product risk. Mitigate: evaluate real outputs with native marketers in phase 2; invest in prompt engineering per module; Russian as fallback.
+1. **Uzbek output quality** — biggest product risk. Mitigate: evaluate real outputs with native marketers in phase 2; invest in prompt engineering per module and iterate against native-marketer feedback.
 2. **Unit economics** — mitigated by credits + token logging from day one.
 3. **Competitor Analyzer expectations** — market the paste-in version honestly; never promise auto-scraping.
 4. **Solo-founder scope creep** — the module cut-line above is the contract; nothing outside MVP until beta feedback.
