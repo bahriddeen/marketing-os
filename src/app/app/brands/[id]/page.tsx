@@ -19,7 +19,9 @@ export default async function EditBrandPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Brendni tahrirlash</h1>
+      <h1 className="font-display text-2xl font-semibold text-ink">
+        Brendni tahrirlash
+      </h1>
       <BrandForm brand={data as Brand} />
     </div>
   );
