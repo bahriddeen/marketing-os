@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 
 const CAPTION =
@@ -12,7 +12,6 @@ export default function CaptionDemo({
 }) {
   const [typed, setTyped] = useState("");
   const [done, setDone] = useState(false);
-  const started = useRef(false);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia(
@@ -24,8 +23,6 @@ export default function CaptionDemo({
       setDone(true);
       return;
     }
-    if (started.current) return;
-    started.current = true;
 
     let i = 0;
     const id = setInterval(() => {
