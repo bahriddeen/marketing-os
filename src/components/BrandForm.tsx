@@ -70,7 +70,7 @@ export default function BrandForm({
         hint="Har qatorda bittadan yozing"
         defaultValue={joined(v.services)}
       />
-      <Area label="USP (asosiy afzallik)" name="usp" defaultValue={v.usp ?? ""} />
+      <Area label="Asosiy afzallik" name="usp" defaultValue={v.usp ?? ""} />
       <Area
         label="Maqsadli auditoriya"
         name="target_audience"
@@ -84,7 +84,7 @@ export default function BrandForm({
         defaultValue={joined(v.competitors)}
       />
       <Field
-        label="Ohang (Tone of Voice)"
+        label="Ohang"
         name="tone_of_voice"
         defaultValue={v.tone_of_voice ?? ""}
       />
