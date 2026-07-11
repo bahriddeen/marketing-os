@@ -27,7 +27,7 @@ export default async function SignupPage({
           </p>
         )}
         <label className="block">
-          <Label>Email</Label>
+          <Label>Elektron pochta</Label>
           <Input name="email" type="email" required placeholder="siz@email.com" />
         </label>
         <label className="block">
