@@ -10,8 +10,8 @@ export default async function HomePage() {
         {ws.name}
       </h1>
       <p className="leading-relaxed text-muted">
-        Brend yarating va kontent generatsiya qiling. AI barcha natijalarni
-        brendingiz ma&apos;lumotlari asosida tayyorlaydi.
+        Brend yarating va kontent generatsiya qiling. Sun‘iy intellekt barcha
+        natijalarni brendingiz ma&apos;lumotlari asosida tayyorlaydi.
       </p>
       <div className="flex gap-3">
         <Link href="/app/brands/new">
