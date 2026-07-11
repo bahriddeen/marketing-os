@@ -29,11 +29,11 @@ export default async function BrandsPage() {
       {brands.length === 0 && (
         <Card className="text-center">
           <p className="text-muted">
-            Hali brendingiz yo’q. Birinchi brendni qo’shing — AI shu
+            Hali brendingiz yo’q. Birinchi brendni qo’shing — Sun’iy intellekt shu
             ma&apos;lumotlar asosida barcha kontentni tayyorlaydi.
           </p>
           <Link href="/app/brands/new" className="mt-4 inline-block">
-            <Button>Birinchi brendni qo’shish</Button>
+            <Button>Birinchi brendni qo‘shish</Button>
           </Link>
         </Card>
       )}
@@ -52,7 +52,7 @@ export default async function BrandsPage() {
               <form action={deleteBrand}>
                 <input type="hidden" name="id" value={b.id} />
                 <button className="font-medium text-danger hover:underline">
-                  O’chirish
+                  O‘chirish
                 </button>
               </form>
             </div>

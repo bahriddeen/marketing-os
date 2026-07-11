@@ -15,7 +15,7 @@ export default async function HomePage() {
       </p>
       <div className="flex gap-3">
         <Link href="/app/brands/new">
-          <Button>Yangi brend qo’shish</Button>
+          <Button>Yangi brend qo‘shish</Button>
         </Link>
         <Link href="/app/copy">
           <Button variant="secondary">Kopiraiting generatsiya qilish</Button>
