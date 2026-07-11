@@ -25,7 +25,7 @@ export default function NewBrandClient() {
       if (json.ok) setFill(json.data);
       else setError(json.error ?? "Xatolik yuz berdi.");
     } catch {
-      setError("Tarmoq xatosi. Qayta urinib ko’ring.");
+      setError("Tarmoq xatosi. Qayta urinib ko‘ring.");
     } finally {
       setLoading(false);
     }
@@ -36,7 +36,7 @@ export default function NewBrandClient() {
       <Card className="max-w-xl space-y-3">
         <h2 className="font-semibold text-ink">Sun‘iy intellekt bilan to‘ldirish</h2>
         <p className="text-sm text-muted">
-          Kompaniyangiz haqida erkin yozing — Sun‘iy intellekt formani o‘zi to’ldiradi.
+          Kompaniyangiz haqida erkin yozing — Sun‘iy intellekt formani o‘zi to‘ldiradi.
         </p>
         <Textarea
           value={description}
@@ -49,7 +49,7 @@ export default function NewBrandClient() {
           onClick={handleFill}
           disabled={loading || description.trim().length < 30}
         >
-          {loading ? "To’ldirilmoqda…" : "Sun‘iy intellekt bilan to‘ldirish"}
+          {loading ? "To‘ldirilmoqda…" : "Sun‘iy intellekt bilan to‘ldirish"}
         </Button>
       </Card>
       <BrandForm
