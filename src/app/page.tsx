@@ -7,7 +7,7 @@ import Button from "@/components/ui/Button";
 const MODULES = [
   {
     title: "Brend bilimlar bazasi",
-    body: "Kompaniyangiz haqida bir marta yozing — mahsulotlar, auditoriya, ohang. Sun&#39;iy intellekt keyingi barcha generatsiyalarda shu ma&#39;lumotni ishlatadi, qayta tushuntirishga hojat yo&#39;q.",
+    body: "Kompaniyangiz haqida bir marta yozing — mahsulotlar, auditoriya, ohang. Sun'iy intellekt keyingi barcha generatsiyalarda shu ma'lumotni ishlatadi, qayta tushuntirishga hojat yo'q.",
   },
   {
     title: "Kontent reja",
