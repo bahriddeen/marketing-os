@@ -1,5 +1,7 @@
 import { saveBrand } from "@/app/app/brands/actions";
 import type { Brand } from "@/lib/types";
+import { Input, Textarea, Label } from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
 
 type Initial = Partial<Omit<Brand, "id" | "workspace_id">>;
 
@@ -16,13 +18,8 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-sm font-medium">{label}</span>
-      <input
-        name={name}
-        defaultValue={defaultValue ?? ""}
-        required={required}
-        className="w-full rounded border p-2"
-      />
+      <Label>{label}</Label>
+      <Input name={name} defaultValue={defaultValue ?? ""} required={required} />
     </label>
   );
 }
@@ -40,14 +37,9 @@ function Area({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-sm font-medium">{label}</span>
-      {hint && <span className="mb-1 block text-xs text-gray-500">{hint}</span>}
-      <textarea
-        name={name}
-        defaultValue={defaultValue ?? ""}
-        rows={3}
-        className="w-full rounded border p-2"
-      />
+      <Label>{label}</Label>
+      {hint && <span className="mb-1.5 block text-xs text-muted">{hint}</span>}
+      <Textarea name={name} defaultValue={defaultValue ?? ""} rows={3} />
     </label>
   );
 }
@@ -78,11 +70,7 @@ export default function BrandForm({
         hint="Har qatorda bittadan yozing"
         defaultValue={joined(v.services)}
       />
-      <Area
-        label="USP (asosiy afzallik)"
-        name="usp"
-        defaultValue={v.usp ?? ""}
-      />
+      <Area label="USP (asosiy afzallik)" name="usp" defaultValue={v.usp ?? ""} />
       <Area
         label="Maqsadli auditoriya"
         name="target_audience"
@@ -105,9 +93,7 @@ export default function BrandForm({
         name="brand_values"
         defaultValue={v.brand_values ?? ""}
       />
-      <button className="rounded bg-black px-4 py-2 text-white">
-        Saqlash
-      </button>
+      <Button type="submit">Saqlash</Button>
     </form>
   );
 }

@@ -2,6 +2,9 @@
 import { useState } from "react";
 import BrandForm from "@/components/BrandForm";
 import type { BrandFill } from "@/lib/ai/schemas";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import { Textarea } from "@/components/ui/Input";
 
 export default function NewBrandClient() {
   const [description, setDescription] = useState("");
@@ -22,7 +25,7 @@ export default function NewBrandClient() {
       if (json.ok) setFill(json.data);
       else setError(json.error ?? "Xatolik yuz berdi.");
     } catch {
-      setError("Tarmoq xatosi. Qayta urinib ko‘ring.");
+      setError("Tarmoq xatosi. Qayta urinib ko’ring.");
     } finally {
       setLoading(false);
     }
@@ -30,28 +33,29 @@ export default function NewBrandClient() {
 
   return (
     <div className="space-y-8">
-      <div className="max-w-xl space-y-3 rounded-xl border bg-white p-4">
-        <h2 className="font-semibold">AI bilan to‘ldirish</h2>
-        <p className="text-sm text-gray-500">
-          Kompaniyangiz haqida erkin yozing — AI formani o‘zi to‘ldiradi.
+      <Card className="max-w-xl space-y-3">
+        <h2 className="font-semibold text-ink">Sun‘iy intellekt bilan to‘ldirish</h2>
+        <p className="text-sm text-muted">
+          Kompaniyangiz haqida erkin yozing — Sun‘iy intellekt formani o‘zi to’ldiradi.
         </p>
-        <textarea
+        <Textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={4}
           placeholder="Masalan: Vetline — Toshkentdagi veterinariya klinikasi. Uy hayvonlari uchun 24/7 xizmat..."
-          className="w-full rounded border p-2"
         />
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
+        {error && <p className="text-sm text-danger">{error}</p>}
+        <Button
           onClick={handleFill}
           disabled={loading || description.trim().length < 30}
-          className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
         >
-          {loading ? "To‘ldirilmoqda…" : "AI bilan to‘ldirish"}
-        </button>
-      </div>
-      <BrandForm key={fill ? JSON.stringify(fill) : "empty"} initial={fill ?? undefined} />
+          {loading ? "To’ldirilmoqda…" : "Sun‘iy intellekt bilan to‘ldirish"}
+        </Button>
+      </Card>
+      <BrandForm
+        key={fill ? JSON.stringify(fill) : "empty"}
+        initial={fill ?? undefined}
+      />
     </div>
   );
 }
