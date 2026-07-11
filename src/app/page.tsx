@@ -7,7 +7,7 @@ import Button from "@/components/ui/Button";
 const MODULES = [
   {
     title: "Brend bilimlar bazasi",
-    body: "Kompaniyangiz haqida bir marta yozing — mahsulotlar, auditoriya, ohang. AI keyingi barcha generatsiyalarda shu ma'lumotni ishlatadi, qayta tushuntirishga hojat yo'q.",
+    body: "Kompaniyangiz haqida bir marta yozing — mahsulotlar, auditoriya, ohang. Sun&#39;iy intellekt keyingi barcha generatsiyalarda shu ma&#39;lumotni ishlatadi, qayta tushuntirishga hojat yo&#39;q.",
   },
   {
     title: "Kontent reja",
@@ -53,7 +53,7 @@ export default async function LandingPage() {
         <section className="grid gap-12 py-16 md:grid-cols-2 md:items-center md:py-24">
           <div>
             <h1 className="font-display text-[2.5rem] font-bold leading-[1.05] tracking-[-0.02em] text-ink sm:text-[3.5rem]">
-              Brendingiz haqida yozing. Tayyor kontentni AI yozadi.
+              Brendingiz haqida yozing. Tayyor kontentni sun&#39;iy intellekt yozadi.
             </h1>
             <p className="mt-6 max-w-md text-lg leading-relaxed text-muted">
               O&#39;zbek marketing va SMM mutaxassislari uchun — brend
