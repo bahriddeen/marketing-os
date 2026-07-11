@@ -1,4 +1,7 @@
 import { signIn } from "@/app/auth/actions";
+import { Input, Label } from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
 import Link from "next/link";
 
 export default async function LoginPage({
@@ -8,37 +11,39 @@ export default async function LoginPage({
 }) {
   const { error } = await searchParams;
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50">
-      <form
-        action={signIn}
-        className="w-full max-w-sm space-y-4 rounded-xl bg-white p-8 shadow"
-      >
-        <h1 className="text-2xl font-bold">Kirish</h1>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <input
-          name="email"
-          type="email"
-          required
-          placeholder="Email"
-          className="w-full rounded border p-2"
-        />
-        <input
-          name="password"
-          type="password"
-          required
-          placeholder="Parol"
-          className="w-full rounded border p-2"
-        />
-        <button className="w-full rounded bg-black p-2 text-white">
+    <AuthSplitLayout>
+      <form action={signIn} className="w-full max-w-sm space-y-5">
+        <div>
+          <h1 className="font-display text-2xl font-semibold text-ink">
+            Kirish
+          </h1>
+          <p className="mt-1 text-sm text-muted">
+            Akkauntingizga kiring va ishni davom ettiring.
+          </p>
+        </div>
+        {error && (
+          <p className="rounded-[0.625rem] border border-danger/20 bg-danger/5 px-3 py-2 text-sm text-danger">
+            {error}
+          </p>
+        )}
+        <label className="block">
+          <Label>Email</Label>
+          <Input name="email" type="email" required placeholder="siz@email.com" />
+        </label>
+        <label className="block">
+          <Label>Parol</Label>
+          <Input name="password" type="password" required placeholder="••••••••" />
+        </label>
+        <Button type="submit" className="w-full">
           Kirish
-        </button>
-        <p className="text-sm">
-          Akkaunt yo‘qmi?{" "}
-          <Link className="underline" href="/signup">
-            Ro‘yxatdan o‘tish
+        </Button>
+        <p className="text-center text-sm text-muted">
+          Akkauntingiz yo&apos;qmi?{" "}
+          <Link className="font-medium text-accent hover:underline" href="/signup">
+            Ro&apos;yxatdan o&apos;tish
           </Link>
         </p>
       </form>
-    </main>
+    </AuthSplitLayout>
   );
 }
