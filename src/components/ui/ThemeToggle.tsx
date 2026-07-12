@@ -1,11 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sun, Moon, Monitor } from "lucide-react";
 
 type Theme = "light" | "dark" | "system";
 
 const OPTIONS: { value: Theme; icon: typeof Sun; label: string }[] = [
-  { value: "light", icon: Sun, label: "Yorug' mavzu" },
+  { value: "light", icon: Sun, label: "Yorug‘ mavzu" },
   { value: "dark", icon: Moon, label: "Tungi mavzu" },
   { value: "system", icon: Monitor, label: "Tizim mavzusi" },
 ];
@@ -21,11 +21,13 @@ function applyTheme(theme: Theme) {
 }
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>(() => {
+  const [theme, setTheme] = useState<Theme>("system");
+
+  useEffect(() => {
     const stored = localStorage.getItem("theme");
-    if (stored === "light" || stored === "dark") return stored;
-    return "system";
-  });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (stored === "light" || stored === "dark") setTheme(stored);
+  }, []);
 
   function handleSelect(value: Theme) {
     setTheme(value);
