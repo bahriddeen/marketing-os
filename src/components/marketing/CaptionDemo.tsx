@@ -1,15 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
-
-const CAPTION =
-  "Yangi mavsum boshlandi 🌿\n\nVetline‘da endi uy hayvonlaringiz uchun bepul birinchi konsultatsiya. Joy soni cheklangan — hoziroq yozing!\n\n#vetline #toshkent #uyhayvonlari";
+import { CAPTIONS } from "./captions";
 
 export default function CaptionDemo({
   variant = "full",
 }: {
   variant?: "full" | "quiet";
 }) {
+  const [caption] = useState(
+    () => CAPTIONS[Math.floor(Math.random() * CAPTIONS.length)],
+  );
   const [typed, setTyped] = useState("");
   const [done, setDone] = useState(false);
 
@@ -19,7 +20,7 @@ export default function CaptionDemo({
     ).matches;
     if (reduceMotion) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setTyped(CAPTION);
+      setTyped(caption);
       setDone(true);
       return;
     }
@@ -27,14 +28,14 @@ export default function CaptionDemo({
     let i = 0;
     const id = setInterval(() => {
       i += 1;
-      setTyped(CAPTION.slice(0, i));
-      if (i >= CAPTION.length) {
+      setTyped(caption.slice(0, i));
+      if (i >= caption.length) {
         clearInterval(id);
         setDone(true);
       }
     }, 18);
     return () => clearInterval(id);
-  }, []);
+  }, [caption]);
 
   return (
     <div

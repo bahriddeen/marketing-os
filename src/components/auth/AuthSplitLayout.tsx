@@ -1,5 +1,5 @@
 import Link from "next/link";
-import CaptionDemo from "@/components/marketing/CaptionDemo";
+import ProductDemo from "@/components/marketing/ProductDemo";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export default function AuthSplitLayout({
@@ -20,7 +20,7 @@ export default function AuthSplitLayout({
           <p className="mb-6 font-display text-2xl font-semibold leading-snug text-white">
             Brendingiz haqida yozing &mdash; qolganini sun&#8216;iy intellekt bajaradi.
           </p>
-          <CaptionDemo variant="quiet" />
+          <ProductDemo />
         </div>
         <p className="text-sm text-white/40">
           O&apos;zbekiston SMM va marketing mutaxassislari uchun
