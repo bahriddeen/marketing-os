@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CaptionDemo from "@/components/marketing/CaptionDemo";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export default function AuthSplitLayout({
   children,
@@ -25,7 +26,10 @@ export default function AuthSplitLayout({
           O&apos;zbekiston SMM va marketing mutaxassislari uchun
         </p>
       </div>
-      <div className="flex w-full flex-col items-center justify-center bg-canvas px-6 py-12 md:w-1/2">
+      <div className="relative flex w-full flex-col items-center justify-center bg-canvas px-6 py-12 md:w-1/2">
+        <div className="absolute right-6 top-6">
+          <ThemeToggle />
+        </div>
         {children}
       </div>
     </div>
