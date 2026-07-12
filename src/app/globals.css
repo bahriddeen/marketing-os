@@ -41,6 +41,30 @@
   }
 }
 
+:root[data-theme="dark"] {
+  --canvas: #101214;
+  --surface: #17191C;
+  --ink: #F2F1ED;
+  --muted: #9AA0A6;
+  --line: #2A2D30;
+  --accent: #2FA679;
+  --accent-hover: #3DBF8C;
+  --accent-soft: #173A2C;
+  --danger: #F2867B;
+}
+
+:root[data-theme="light"] {
+  --canvas: #FAFAF8;
+  --surface: #FFFFFF;
+  --ink: #14171B;
+  --muted: #6B7280;
+  --line: #E6E4DF;
+  --accent: #146B4F;
+  --accent-hover: #0F5A41;
+  --accent-soft: #E3F3EA;
+  --danger: #B3261E;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
