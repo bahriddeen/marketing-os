@@ -50,7 +50,9 @@ export default function Sidebar({ credits }: { credits: number }) {
         <span className="font-mono text-sm tabular-nums text-muted md:hidden">
           {credits}
         </span>
-        <ThemeToggle />
+        <div className="md:self-start">
+          <ThemeToggle />
+        </div>
         <form action={signOut}>
           <Button type="submit" variant="ghost" aria-label="Chiqish" className="gap-2 px-3">
             <LogOut size={18} strokeWidth={1.75} />

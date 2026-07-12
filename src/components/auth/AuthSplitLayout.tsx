@@ -26,11 +26,13 @@ export default function AuthSplitLayout({
           O&apos;zbekiston SMM va marketing mutaxassislari uchun
         </p>
       </div>
-      <div className="relative flex w-full flex-col items-center justify-center bg-canvas px-6 py-12 md:w-1/2">
-        <div className="absolute right-6 top-6">
+      <div className="flex w-full flex-col bg-canvas px-6 pb-12 pt-6 md:w-1/2">
+        <div className="flex justify-end">
           <ThemeToggle />
         </div>
-        {children}
+        <div className="flex flex-1 flex-col items-center justify-center">
+          {children}
+        </div>
       </div>
     </div>
   );
