@@ -1,5 +1,5 @@
 "use client";
-import Card from "@/components/ui/Card";
+import { Loader2 } from "lucide-react";
 import { useRotatingStatus } from "./useRotatingStatus";
 
 export default function GeneratingCard({
@@ -13,14 +13,14 @@ export default function GeneratingCard({
   if (!active) return null;
 
   return (
-    <Card className="space-y-3">
-      <p className="text-sm font-medium text-ink">
+    <div className="flex items-center gap-2 py-1">
+      <Loader2 size={14} className="shrink-0 animate-spin text-accent" />
+      <span
+        key={message}
+        className="text-sm text-muted animate-[fade-in_500ms_ease-out]"
+      >
         {message}
-        <span className="animate-pulse text-accent"> ▍</span>
-      </p>
-      <div className="h-1 w-full overflow-hidden rounded-full bg-accent-soft">
-        <div className="h-full w-1/3 rounded-full bg-accent animate-[indeterminate-slide_1.4s_ease-in-out_infinite]" />
-      </div>
-    </Card>
+      </span>
+    </div>
   );
 }

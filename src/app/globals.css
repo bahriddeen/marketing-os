@@ -73,14 +73,11 @@
   }
 }
 
-@keyframes indeterminate-slide {
-  0% {
-    transform: translateX(-100%);
+@keyframes fade-in {
+  from {
+    opacity: 0;
   }
-  50% {
-    transform: translateX(150%);
-  }
-  100% {
-    transform: translateX(-100%);
+  to {
+    opacity: 1;
   }
 }

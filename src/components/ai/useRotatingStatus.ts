@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 export function useRotatingStatus(
   active: boolean,
   messages: string[],
-  intervalMs = 2200,
+  intervalMs = 3200,
 ): string {
   const [index, setIndex] = useState(0);
 
