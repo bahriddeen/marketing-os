@@ -5,6 +5,15 @@ import type { BrandFill } from "@/lib/ai/schemas";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Input";
+import GeneratingCard from "@/components/ai/GeneratingCard";
+
+const BRAND_FILL_STATUS_MESSAGES = [
+  "O‘qimoqda…",
+  "Ma‘lumotlarni ajratmoqda…",
+  "Maydonlarni to‘ldirmoqda…",
+  "Aniqlashtirmoqda…",
+  "Yakunlamoqda…",
+];
 
 export default function NewBrandClient() {
   const [description, setDescription] = useState("");
@@ -51,6 +60,7 @@ export default function NewBrandClient() {
         >
           {loading ? "To‘ldirilmoqda…" : "Sun‘iy intellekt bilan to‘ldirish"}
         </Button>
+        <GeneratingCard active={loading} messages={BRAND_FILL_STATUS_MESSAGES} />
       </Card>
       <BrandForm
         key={fill ? JSON.stringify(fill) : "empty"}
