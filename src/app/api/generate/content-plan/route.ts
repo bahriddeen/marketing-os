@@ -89,7 +89,6 @@ export async function POST(req: Request) {
       goal,
       period_start: String(periodStart),
       post_count: result.data.posts.length,
-      posts: result.data.posts,
       generation_id: result.generationId,
     })
     .select("id")
@@ -97,6 +96,28 @@ export async function POST(req: Request) {
 
   if (error || !plan) {
     console.error("content plan insert failed", error);
+    return NextResponse.json(
+      { ok: false, error: "Planni saqlab bo‘lmadi. Qayta urinib ko‘ring." },
+      { status: 500 }
+    );
+  }
+
+  const rows = result.data.posts.map((p, i) => ({
+    plan_id: plan.id,
+    workspace_id: ws.id,
+    brand_id: brand.id,
+    date: p.date,
+    topic: p.topic,
+    format: p.format,
+    hook: p.hook,
+    cta: p.cta,
+    goal: p.goal,
+    position: i + 1,
+  }));
+  const { error: postsError } = await supabase.from("plan_posts").insert(rows);
+  if (postsError) {
+    console.error("plan posts insert failed", postsError);
+    await supabase.from("content_plans").delete().eq("id", plan.id);
     return NextResponse.json(
       { ok: false, error: "Planni saqlab bo‘lmadi. Qayta urinib ko‘ring." },
       { status: 500 }
