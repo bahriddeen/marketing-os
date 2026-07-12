@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { planToCsv, planToXlsx } from "@/lib/planExport";
+import { planToCsv, planToXlsx, type PlanExportPost } from "@/lib/planExport";
 import { planFilename } from "@/lib/plans";
-import type { PlanPost } from "@/lib/ai/schemas";
 
 export async function GET(
   req: Request,
@@ -13,14 +12,19 @@ export async function GET(
   const supabase = await createClient();
   const { data: plan } = await supabase
     .from("content_plans")
-    .select("title, posts")
+    .select("title")
     .eq("id", id)
     .maybeSingle();
   if (!plan) {
     return new Response("Topilmadi", { status: 404 });
   }
 
-  const posts = plan.posts as PlanPost[];
+  const { data: postsData } = await supabase
+    .from("plan_posts")
+    .select("date, topic, format, hook, cta, goal, status")
+    .eq("plan_id", id)
+    .order("position", { ascending: true });
+  const posts = (postsData ?? []) as PlanExportPost[];
 
   if (format === "csv") {
     return new Response(planToCsv(posts), {
