@@ -4,7 +4,6 @@ import Link from "next/link";
 import Button from "@/components/ui/Button";
 import PlanTable from "./PlanTable";
 import type { ContentPlan, PlanPostRow } from "@/lib/types";
-import type { PlanPost } from "@/lib/ai/schemas";
 
 export default async function PlanDetailPage({
   params,
@@ -19,7 +18,14 @@ export default async function PlanDetailPage({
     .eq("id", id)
     .maybeSingle();
   if (!data) notFound();
-  const plan = data as unknown as ContentPlan & { posts: PlanPost[]; brands: { name: string } | null };
+  const plan = data as unknown as ContentPlan & { brands: { name: string } | null };
+
+  const { data: postsData } = await supabase
+    .from("plan_posts")
+    .select("*")
+    .eq("plan_id", id)
+    .order("position", { ascending: true });
+  const posts = (postsData ?? []) as PlanPostRow[];
 
   return (
     <div className="space-y-6">
@@ -42,12 +48,12 @@ export default async function PlanDetailPage({
           </a>
         </div>
       </div>
-      <PlanTable planId={plan.id} initialPosts={plan.posts} />
+      <PlanTable initialPosts={posts} />
       <Link
         className="inline-block text-sm font-medium text-accent hover:underline"
         href="/app/plan"
       >
-        ← Barcha planlar
+        ← Barcha postlar
       </Link>
     </div>
   );

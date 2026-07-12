@@ -1,52 +1,69 @@
 "use server";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { PlanPostSchema, type PlanPost } from "@/lib/ai/schemas";
-import { mergePlanPost, type PlanPostEdit } from "@/lib/plans";
+import { PLAN_STATUS_VALUES } from "@/lib/plans";
 
-const EditSchema = PlanPostSchema.pick({
-  topic: true,
-  format: true,
-  hook: true,
-  cta: true,
-  goal: true,
-}).partial();
+const PostEditSchema = z
+  .object({
+    topic: z.string().min(1),
+    format: z.enum(["post", "carousel", "reels", "story"]),
+    hook: z.string(),
+    cta: z.string(),
+    goal: z.string(),
+    status: z.enum(PLAN_STATUS_VALUES),
+  })
+  .partial();
+export type PostEditInput = z.infer<typeof PostEditSchema>;
 
 export async function updatePlanPost(
-  planId: string,
-  index: number,
-  edit: PlanPostEdit
+  postId: string,
+  edit: PostEditInput
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  const parsed = EditSchema.safeParse(edit);
-  if (!parsed.success) {
+  const parsed = PostEditSchema.safeParse(edit);
+  if (!parsed.success || Object.keys(parsed.data).length === 0) {
     return { ok: false, error: "Noto‘g‘ri qiymat." };
   }
 
   const supabase = await createClient();
-  const { data: plan } = await supabase
-    .from("content_plans")
-    .select("posts")
-    .eq("id", planId)
+  const { data, error } = await supabase
+    .from("plan_posts")
+    .update({ ...parsed.data, updated_at: new Date().toISOString() })
+    .eq("id", postId)
+    .select("id")
     .maybeSingle();
-  if (!plan) {
-    return { ok: false, error: "Plan topilmadi." };
+  if (error || !data) {
+    return { ok: false, error: "Saqlab bo‘lmadi. Qayta urinib ko‘ring." };
   }
 
-  let posts: PlanPost[];
-  try {
-    posts = mergePlanPost(plan.posts as PlanPost[], index, parsed.data);
-  } catch {
-    return { ok: false, error: "Post topilmadi." };
+  revalidatePath("/app/plan");
+  return { ok: true };
+}
+
+const BulkStatusSchema = z.object({
+  ids: z.array(z.string().uuid()).min(1).max(100),
+  status: z.enum(PLAN_STATUS_VALUES),
+});
+
+export async function bulkUpdateStatus(
+  ids: string[],
+  status: string
+): Promise<{ ok: true; updated: number } | { ok: false; error: string }> {
+  const parsed = BulkStatusSchema.safeParse({ ids, status });
+  if (!parsed.success) {
+    return { ok: false, error: "Noto‘g‘ri so‘rov." };
   }
 
-  const { error } = await supabase
-    .from("content_plans")
-    .update({ posts, updated_at: new Date().toISOString() })
-    .eq("id", planId);
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("plan_posts")
+    .update({ status: parsed.data.status, updated_at: new Date().toISOString() })
+    .in("id", parsed.data.ids)
+    .select("id");
   if (error) {
     return { ok: false, error: "Saqlab bo‘lmadi. Qayta urinib ko‘ring." };
   }
 
-  revalidatePath(`/app/plan/${planId}`);
-  return { ok: true };
+  revalidatePath("/app/plan");
+  return { ok: true, updated: (data ?? []).length };
 }

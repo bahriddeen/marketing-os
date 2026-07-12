@@ -1,4 +1,3 @@
-import type { PlanPost } from "@/lib/ai/schemas";
 import type { PlanStatus } from "@/lib/plans";
 
 export type Workspace = {
