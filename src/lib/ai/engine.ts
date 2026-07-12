@@ -9,7 +9,7 @@ const MODEL = "claude-opus-4-8";
 const client = new Anthropic();
 
 export type GenerationResult<T> =
-  | { ok: true; data: T; creditsLeft: number }
+  | { ok: true; data: T; creditsLeft: number; generationId: string | null }
   | { ok: false; error: string };
 
 export async function runStructuredGeneration<T>(opts: {
@@ -90,5 +90,5 @@ export async function runStructuredGeneration<T>(opts: {
     });
   }
 
-  return { ok: true, data, creditsLeft: balance - weight };
+  return { ok: true, data, creditsLeft: balance - weight, generationId: gen?.id ?? null };
 }
