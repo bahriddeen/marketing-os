@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import CaptionDemo from "@/components/marketing/CaptionDemo";
+import HeroPreview from "@/components/marketing/HeroPreview";
 import Button from "@/components/ui/Button";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import { BookOpen, Calendar, Clapperboard, PenLine } from "lucide-react";
 
 const MODULES = [
   {
@@ -22,6 +23,13 @@ const MODULES = [
     title: "Kopiraiting",
     body: "Post, reklama matni yoki SMS — formatga mos, sotuvga yo‘naltirilgan matnlarni soniyalarda yarating.",
   },
+];
+
+const MODULE_ROW = [
+  { label: "Bilimlar bazasi", Icon: BookOpen },
+  { label: "Kontent reja", Icon: Calendar },
+  { label: "Reels", Icon: Clapperboard },
+  { label: "Kopiraiting", Icon: PenLine },
 ];
 
 export default async function LandingPage() {
@@ -52,25 +60,35 @@ export default async function LandingPage() {
       </header>
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-6">
-        <section className="grid gap-12 py-16 md:grid-cols-2 md:items-center md:py-24">
-          <div>
-            <h1 className="font-display text-[2.5rem] font-bold leading-[1.05] tracking-[-0.02em] text-ink sm:text-[3.5rem]">
-              Brendingiz haqida yozing. Tayyor kontentni sun‘iy intellekt yozadi.
-            </h1>
-            <p className="mt-6 max-w-md text-lg leading-relaxed text-muted">
-              O‘zbek marketing va SMM mutaxassislari uchun — brend
-              ma‘lumotidan Instagram va Telegram‘ga tayyor post, reels
-              ssenariysi va reklama matni.
-            </p>
-            <div className="mt-8">
-              <Link href="/signup">
-                <Button className="px-6 py-3 text-base">
-                  Bepul boshlash
-                </Button>
-              </Link>
-            </div>
+        <section className="py-16 text-center md:py-24">
+          <h1 className="mx-auto max-w-3xl font-display text-[2.75rem] font-bold leading-[1.05] tracking-[-0.02em] text-ink sm:text-[4rem] md:text-[4.5rem]">
+            Brendingiz haqida yozing — tayyor kontentni{" "}
+            <span className="text-accent">sun‘iy intellekt</span> yozadi.
+          </h1>
+          <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted">
+            O‘zbek marketing va SMM mutaxassislari uchun — brend
+            ma‘lumotidan Instagram va Telegram‘ga tayyor post, reels
+            ssenariysi va reklama matni.
+          </p>
+          <div className="mt-8 flex justify-center">
+            <Link href="/signup">
+              <Button className="px-6 py-3 text-base">
+                Bepul boshlash
+              </Button>
+            </Link>
           </div>
-          <CaptionDemo />
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+            {MODULE_ROW.map(({ label, Icon }) => (
+              <span
+                key={label}
+                className="flex items-center gap-1.5 text-xs text-muted"
+              >
+                <Icon size={14} strokeWidth={1.75} />
+                {label}
+              </span>
+            ))}
+          </div>
+          <HeroPreview />
         </section>
 
         <section className="grid gap-8 border-t border-line py-16 sm:grid-cols-2">
