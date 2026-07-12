@@ -10,10 +10,6 @@ const NAV_ITEMS = [
 export default function HeroPreview() {
   return (
     <div className="relative mx-auto mt-16 max-w-4xl">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-x-6 -top-16 -bottom-16 animate-[hero-glow-drift_12s_ease-in-out_infinite] rounded-[3rem] bg-[radial-gradient(ellipse_at_center,_var(--accent)_0%,_transparent_65%)] blur-2xl sm:-inset-x-16"
-      />
       <div className="relative overflow-hidden rounded-[1.25rem] border border-line bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]">
         <div className="flex items-center gap-1.5 border-b border-line px-4 py-3">
           <span className="h-2.5 w-2.5 rounded-full bg-line" />

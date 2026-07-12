@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import HeroPreview from "@/components/marketing/HeroPreview";
 import Button from "@/components/ui/Button";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import { BeamsBackground } from "@/components/ui/BeamsBackground";
 import { BookOpen, Calendar, Clapperboard, PenLine } from "lucide-react";
 
 const MODULES = [
@@ -40,11 +41,7 @@ export default async function LandingPage() {
   if (user) redirect("/app");
 
   return (
-    <div className="relative flex min-h-screen flex-col overflow-hidden bg-canvas">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 -top-40 -z-10 h-[36rem] animate-[hero-glow-drift_12s_ease-in-out_infinite] bg-[radial-gradient(ellipse_at_top,_var(--accent)_0%,_transparent_65%)] blur-3xl"
-      />
+    <BeamsBackground className="flex min-h-screen flex-col">
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
         <span className="font-display text-lg font-semibold text-ink">
           AI Marketing OS
@@ -112,6 +109,6 @@ export default async function LandingPage() {
           © {new Date().getFullYear()} AI Marketing OS
         </p>
       </footer>
-    </div>
+    </BeamsBackground>
   );
 }
