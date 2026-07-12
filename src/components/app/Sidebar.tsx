@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Briefcase, PenLine, LogOut } from "lucide-react";
+import { Home, Briefcase, CalendarDays, PenLine, LogOut } from "lucide-react";
 import Button from "@/components/ui/Button";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { signOut } from "@/app/auth/actions";
@@ -9,6 +9,7 @@ import { signOut } from "@/app/auth/actions";
 const NAV = [
   { href: "/app", label: "Bosh sahifa", icon: Home, exact: true },
   { href: "/app/brands", label: "Brendlar", icon: Briefcase, exact: false },
+  { href: "/app/plan", label: "Kontent-plan", icon: CalendarDays, exact: false },
   { href: "/app/copy", label: "Kopiraiting", icon: PenLine, exact: false },
 ];
 
