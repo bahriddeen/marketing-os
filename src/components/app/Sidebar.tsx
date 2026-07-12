@@ -15,7 +15,7 @@ const NAV = [
 export default function Sidebar({ credits }: { credits: number }) {
   const pathname = usePathname();
   return (
-    <aside className="flex w-full items-center justify-between gap-2 border-b border-line bg-surface p-3 md:w-60 md:flex-col md:items-stretch md:justify-start md:gap-1 md:border-b-0 md:border-r md:p-4">
+    <aside className="flex w-full items-center justify-between gap-2 border-b border-line bg-surface p-3 md:sticky md:top-0 md:h-screen md:w-60 md:flex-col md:items-stretch md:justify-start md:gap-1 md:self-start md:overflow-y-auto md:border-b-0 md:border-r md:p-4">
       <Link
         href="/app"
         className="hidden px-2 font-display text-lg font-semibold text-ink md:mb-6 md:block"

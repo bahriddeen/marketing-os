@@ -5,7 +5,10 @@
       "Bash(npm test *)",
       "Bash(npm run *)",
       "Bash(git add *)",
-      "Bash(git commit -q -m 'fix: workspace bootstrap race creating duplicate workspaces *)"
+      "Bash(git commit -q -m 'fix: workspace bootstrap race creating duplicate workspaces *)",
+      "Bash(gh repo *)",
+      "Bash(command -v vercel)",
+      "Bash(vercel whoami *)"
     ]
   }
 }

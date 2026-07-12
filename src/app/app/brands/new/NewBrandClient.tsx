@@ -41,8 +41,8 @@ export default function NewBrandClient() {
   }
 
   return (
-    <div className="space-y-8">
-      <Card className="max-w-xl space-y-3">
+    <div className="max-w-4xl space-y-8">
+      <Card className="space-y-3">
         <h2 className="font-semibold text-ink">Sun‘iy intellekt bilan to‘ldirish</h2>
         <p className="text-sm text-muted">
           Kompaniyangiz haqida erkin yozing — Sun‘iy intellekt formani o‘zi to‘ldiradi.
