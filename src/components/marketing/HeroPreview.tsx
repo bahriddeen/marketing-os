@@ -12,7 +12,7 @@ export default function HeroPreview() {
     <div className="relative mx-auto mt-16 max-w-4xl">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 -top-10 h-72 bg-[radial-gradient(ellipse_at_top,_var(--accent)_0%,_transparent_60%)] opacity-[0.08]"
+        className="pointer-events-none absolute inset-x-0 -top-10 h-72 animate-[hero-glow-drift_12s_ease-in-out_infinite] bg-[radial-gradient(ellipse_at_top,_var(--accent)_0%,_transparent_60%)]"
       />
       <div className="relative overflow-hidden rounded-[1.25rem] border border-line bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]">
         <div className="flex items-center gap-1.5 border-b border-line px-4 py-3">
