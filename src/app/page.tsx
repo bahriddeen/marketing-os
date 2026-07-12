@@ -40,7 +40,11 @@ export default async function LandingPage() {
   if (user) redirect("/app");
 
   return (
-    <div className="flex min-h-screen flex-col bg-canvas">
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-canvas">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 -top-40 -z-10 h-[36rem] animate-[hero-glow-drift_12s_ease-in-out_infinite] bg-[radial-gradient(ellipse_at_top,_var(--accent)_0%,_transparent_65%)] blur-3xl"
+      />
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
         <span className="font-display text-lg font-semibold text-ink">
           AI Marketing OS
