@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { buildBrandContext } from "./prompts";
 import { CREDIT_WEIGHTS } from "./credits";
-import { CopyVariantsSchema } from "./schemas";
+import { CopyVariantsSchema, ContentPlanSchema } from "./schemas";
 import type { Brand } from "@/lib/types";
 
 const brand: Brand = {
@@ -58,5 +58,34 @@ describe("CopyVariantsSchema", () => {
         .success
     ).toBe(true);
     expect(CopyVariantsSchema.safeParse({ variants: [] }).success).toBe(false);
+  });
+});
+
+describe("ContentPlanSchema", () => {
+  const post = {
+    date: "2026-08-03",
+    topic: "Uy hayvonlari uchun yozgi parvarish",
+    format: "carousel",
+    hook: "Yozda itingiz eng ko‘p nimadan aziyat chekadi?",
+    cta: "Batafsil konsultatsiya uchun yozing",
+    goal: "Auditoriyaga foyda berish",
+  };
+
+  it("accepts a valid plan", () => {
+    const r = ContentPlanSchema.safeParse({ title: "Vetline — avgust", posts: [post] });
+    expect(r.success).toBe(true);
+  });
+
+  it("rejects bad format enum and bad date", () => {
+    expect(
+      ContentPlanSchema.safeParse({ title: "t", posts: [{ ...post, format: "video" }] }).success
+    ).toBe(false);
+    expect(
+      ContentPlanSchema.safeParse({ title: "t", posts: [{ ...post, date: "3-avgust" }] }).success
+    ).toBe(false);
+  });
+
+  it("rejects empty posts", () => {
+    expect(ContentPlanSchema.safeParse({ title: "t", posts: [] }).success).toBe(false);
   });
 });

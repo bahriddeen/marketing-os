@@ -5,6 +5,22 @@ export const CopyVariantsSchema = z.object({
 });
 export type CopyVariants = z.infer<typeof CopyVariantsSchema>;
 
+export const PlanPostSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  topic: z.string(),
+  format: z.enum(["post", "carousel", "reels", "story"]),
+  hook: z.string(),
+  cta: z.string(),
+  goal: z.string(),
+});
+export type PlanPost = z.infer<typeof PlanPostSchema>;
+
+export const ContentPlanSchema = z.object({
+  title: z.string(),
+  posts: z.array(PlanPostSchema).min(1).max(31),
+});
+export type ContentPlanOutput = z.infer<typeof ContentPlanSchema>;
+
 export const BrandFillSchema = z.object({
   name: z.string(),
   industry: z.string(),
