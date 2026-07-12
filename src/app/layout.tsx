@@ -31,6 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="uz"
+      suppressHydrationWarning
       className={`${instrumentSans.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <head>
