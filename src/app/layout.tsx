@@ -31,8 +31,16 @@ export default function RootLayout({
   return (
     <html
       lang="uz"
+      suppressHydrationWarning
       className={`${instrumentSans.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t;}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="flex min-h-full flex-col bg-canvas text-ink font-sans">
         {children}
       </body>

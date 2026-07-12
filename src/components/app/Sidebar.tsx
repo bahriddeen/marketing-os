@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Briefcase, PenLine, LogOut } from "lucide-react";
 import Button from "@/components/ui/Button";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 import { signOut } from "@/app/auth/actions";
 
 const NAV = [
@@ -49,6 +50,7 @@ export default function Sidebar({ credits }: { credits: number }) {
         <span className="font-mono text-sm tabular-nums text-muted md:hidden">
           {credits}
         </span>
+        <ThemeToggle />
         <form action={signOut}>
           <Button type="submit" variant="ghost" aria-label="Chiqish" className="gap-2 px-3">
             <LogOut size={18} strokeWidth={1.75} />

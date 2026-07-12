@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import CaptionDemo from "@/components/marketing/CaptionDemo";
 import Button from "@/components/ui/Button";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 const MODULES = [
   {
@@ -37,6 +38,7 @@ export default async function LandingPage() {
           AI Marketing OS
         </span>
         <nav className="flex items-center gap-6">
+          <ThemeToggle />
           <Link
             href="/login"
             className="text-sm font-medium text-muted hover:text-ink"
