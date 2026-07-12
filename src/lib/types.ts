@@ -1,4 +1,5 @@
 import type { PlanPost } from "@/lib/ai/schemas";
+import type { PlanStatus } from "@/lib/plans";
 
 export type Workspace = {
   id: string;
@@ -32,8 +33,24 @@ export type ContentPlan = {
   goal: "awareness" | "engagement" | "sales";
   period_start: string;
   post_count: number;
-  posts: PlanPost[];
   generation_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PlanPostRow = {
+  id: string;
+  plan_id: string;
+  workspace_id: string;
+  brand_id: string;
+  date: string;
+  topic: string;
+  format: "post" | "carousel" | "reels" | "story";
+  hook: string;
+  cta: string;
+  goal: string;
+  status: PlanStatus;
+  position: number;
   created_at: string;
   updated_at: string;
 };

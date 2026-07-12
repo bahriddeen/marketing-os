@@ -10,6 +10,10 @@
   --accent-hover: #0F5A41;
   --accent-soft: #E3F3EA;
   --danger: #B3261E;
+  --info: #1E5FA8;
+  --info-soft: #E3EDF8;
+  --warn: #8A5A00;
+  --warn-soft: #F6EED9;
 }
 
 @theme inline {
@@ -22,6 +26,10 @@
   --color-accent-hover: var(--accent-hover);
   --color-accent-soft: var(--accent-soft);
   --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
   --font-display: var(--font-instrument-sans);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
@@ -38,6 +46,10 @@
     --accent-hover: #3DBF8C;
     --accent-soft: #173A2C;
     --danger: #F2867B;
+    --info: #6FA8E8;
+    --info-soft: #182A40;
+    --warn: #D9A94A;
+    --warn-soft: #3A2E14;
   }
 }
 
@@ -52,6 +64,10 @@
   --accent-hover: #3DBF8C;
   --accent-soft: #173A2C;
   --danger: #F2867B;
+  --info: #6FA8E8;
+  --info-soft: #182A40;
+  --warn: #D9A94A;
+  --warn-soft: #3A2E14;
 }
 
 :root[data-theme="light"] {
@@ -64,6 +80,10 @@
   --accent-hover: #0F5A41;
   --accent-soft: #E3F3EA;
   --danger: #B3261E;
+  --info: #1E5FA8;
+  --info-soft: #E3EDF8;
+  --warn: #8A5A00;
+  --warn-soft: #F6EED9;
 }
 
 @media (prefers-reduced-motion: reduce) {

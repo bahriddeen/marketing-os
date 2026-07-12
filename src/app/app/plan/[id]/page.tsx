@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import PlanTable from "./PlanTable";
-import type { ContentPlan } from "@/lib/types";
+import type { ContentPlan, PlanPostRow } from "@/lib/types";
+import type { PlanPost } from "@/lib/ai/schemas";
 
 export default async function PlanDetailPage({
   params,
@@ -18,7 +19,7 @@ export default async function PlanDetailPage({
     .eq("id", id)
     .maybeSingle();
   if (!data) notFound();
-  const plan = data as unknown as ContentPlan & { brands: { name: string } | null };
+  const plan = data as unknown as ContentPlan & { posts: PlanPost[]; brands: { name: string } | null };
 
   return (
     <div className="space-y-6">
