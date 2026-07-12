@@ -1,1 +1,58 @@
-@AGENTS.md
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Commands
+
+```bash
+npm run dev             # start dev server (Turbopack) at localhost:3000
+npm run build            # production build
+npm run lint              # eslint (flat config, next/core-web-vitals + next/typescript)
+npm test                    # vitest run — all tests
+npx vitest run src/lib/ai/engine.test.ts   # single test file
+npx vitest run -t "includes all brand fields"  # single test by name
+npx tsc --noEmit          # typecheck only (not wired into a script, but standard gate)
+```
+
+Tests live next to the code they test (`src/lib/ai/engine.test.ts`), included via `src/**/*.test.ts` in `vitest.config.ts`. There is no `passWithNoTests: false` gate — an empty test run is a pass.
+
+### Environment
+
+Copy `.env.example` to `.env.local`: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `ANTHROPIC_API_KEY`. Schema lives in `supabase/migrations/*.sql` — apply new migrations by running them in the Supabase SQL editor (no CLI migration runner is wired up).
+
+## Architecture
+
+**Product:** AI Marketing OS — Uzbek-market SaaS that generates marketing content (copy, reels scripts, content plans) from a persistent per-brand knowledge base, so the user never re-explains their company. Solo-founder MVP; see `docs/superpowers/specs/` and `docs/superpowers/plans/` for the original TZ, MVP build plan, and the 2026-07-12 frontend redesign spec/plan.
+
+**Stack:** Next.js 16 App Router + TypeScript, Supabase (Postgres + RLS + Auth via `@supabase/ssr`), Anthropic API (`claude-opus-4-8`) via a shared generation engine, Tailwind CSS v4 (CSS-first config, no `tailwind.config.*` — theme tokens live in `src/app/globals.css`'s `@theme inline` block), Zod for structured AI output and input validation.
+
+### Auth, workspaces, and multi-tenancy
+
+- `src/middleware.ts` refreshes the Supabase session cookie on every request and redirects unauthenticated visitors away from `/app/*` to `/login` (matcher: `/app/:path*`, `/login`, `/signup`).
+- `getOrCreateWorkspace()` in `src/lib/workspace.ts` is the entry point every `/app/*` page/layout calls. It's wrapped in React's `cache()` so parallel layout+page rendering share one call instead of racing to create duplicate workspaces on first login — this specifically fixed a real bug (see `supabase/migrations/0002_bootstrap_race_fix.sql`). If you lose a concurrent-insert race (unique index on `workspace_members.user_id`), it deletes its own just-created workspace and re-reads the winner's — don't remove that fallback path.
+- **One workspace per user is a DB-enforced MVP invariant** (`workspace_members_one_per_user` unique index). Multi-workspace/team-seat support means dropping that index, not just changing app code.
+- All tenant tables (`brands`, `generations`, `chat_conversations`, `chat_messages`, `credit_ledger`) are workspace-scoped via RLS policies built on `is_member(workspace_id)`, a `security definer` SQL function (avoids RLS self-recursion). New tables that hold tenant data need the same `is_member()`-based policy, not ad hoc `workspace_id = ...` checks.
+
+### AI generation engine (`src/lib/ai/`)
+
+`runStructuredGeneration()` in `engine.ts` is the single choke point every generation module calls — it checks the credit balance, calls Anthropic with a Zod output schema, persists the result to `generations`, and debits `credit_ledger`. To add a new generation module (content plan, reels, chat, …):
+
+1. Add the module id + credit weight to `credits.ts` (`ModuleId`, `CREDIT_WEIGHTS`).
+2. Add its output shape to `schemas.ts` (a `z.object(...)`).
+3. Add a `modules/<name>.ts` with format/style enums and an instructions-builder function, following `modules/copy.ts`.
+4. Add an API route under `src/app/api/generate/<name>/route.ts` that validates input, loads the brand, and calls `runStructuredGeneration` — follow `api/generate/copy/route.ts`.
+
+Prompt structure is two cached system blocks (`cache_control: { type: "ephemeral" }`): a stable `SYSTEM_BASE` (persona + Uzbek-only instruction) and a per-request block of `buildBrandContext(brand) + moduleInstructions`. This is what makes repeated generations for the same brand cheap — don't collapse these into one uncached block or inline the brand context into the user message.
+
+Credits are a ledger, not a counter: balance is always `sum(credit_ledger.delta)` for the workspace (see `getCreditBalance`). New credit grants/spends are ledger inserts with a `reason` (`generation` | `plan_grant` | `admin_adjust`), never a direct balance update.
+
+### Frontend
+
+- Design tokens (colors, fonts, dark mode via `prefers-color-scheme`) are CSS custom properties in `src/app/globals.css`, re-exposed to Tailwind through `@theme inline`. Components use semantic utilities (`bg-canvas`, `text-ink`, `text-muted`, `bg-accent`, `border-line`, etc.) — never raw Tailwind palette colors (`bg-gray-500`, `text-red-600`) or hardcoded hex.
+- Shared UI primitives live in `src/components/ui/` (`Button`, `Input`/`Textarea`/`Select`/`Label`, `Card`) — restyle/extend pages through these rather than one-off `<input>`/`<button>` markup.
+- `src/components/marketing/CaptionDemo.tsx` is the product's signature visual element (a live-typing demo of a generated caption), reused on the landing hero and the auth split-screen panel (`src/components/auth/AuthSplitLayout.tsx`). It respects `prefers-reduced-motion` — don't add motion that bypasses that check.
+- The sidebar (`src/components/app/Sidebar.tsx`) is a client component (`usePathname` for active-route state) rendered from the otherwise-server `src/app/app/layout.tsx`; it collapses to an icon-only top bar below `md:`, not a hidden drawer.
+
+### Language constraint
+
+All UI copy and AI-generated content must be Uzbek (Latin script) only — see `SYSTEM_BASE` in `src/lib/ai/prompts.ts` and every existing page/component. No Russian, no English strings, with the single exception of the product name "AI Marketing OS". This has caused recurring bugs worth watching for specifically: bare "AI" used as a common noun instead of "sun'iy intellekt", the wrong Unicode apostrophe (U+2019 instead of this codebase's U+2018 for the tutuq belgisi), and HTML entities (`&#39;`/`&apos;`) that only decode inside literal JSX text — not inside JS string literals/variables interpolated via `{expr}`.
