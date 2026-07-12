@@ -43,6 +43,9 @@ export default function Sidebar({ credits }: { credits: number }) {
         })}
       </nav>
       <div className="flex items-center gap-3 md:mt-auto md:flex-col md:items-stretch md:gap-3 md:pt-4">
+        <div className="md:self-start">
+          <ThemeToggle />
+        </div>
         <div className="hidden rounded-[0.625rem] bg-canvas px-3 py-2.5 md:block">
           <p className="text-xs text-muted">Kreditlar</p>
           <p className="font-mono text-lg tabular-nums text-ink">{credits}</p>
@@ -50,9 +53,6 @@ export default function Sidebar({ credits }: { credits: number }) {
         <span className="font-mono text-sm tabular-nums text-muted md:hidden">
           {credits}
         </span>
-        <div className="md:self-start">
-          <ThemeToggle />
-        </div>
         <form action={signOut}>
           <Button type="submit" variant="ghost" aria-label="Chiqish" className="gap-2 px-3">
             <LogOut size={18} strokeWidth={1.75} />
