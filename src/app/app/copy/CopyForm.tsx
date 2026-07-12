@@ -9,6 +9,16 @@ import {
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Select, Textarea, Label } from "@/components/ui/Input";
+import GeneratingCard from "@/components/ai/GeneratingCard";
+
+const COPY_STATUS_MESSAGES = [
+  "O‘ylamoqda…",
+  "G‘oyalar qidirmoqda…",
+  "So‘zlarni tanlamoqda…",
+  "Yozmoqda…",
+  "Sayqallamoqda…",
+  "Yakunlamoqda…",
+];
 
 type BrandOption = { id: string; name: string };
 type Variant = { text: string };
@@ -115,6 +125,8 @@ export default function CopyForm({ brands }: { brands: BrandOption[] }) {
           <p className="text-sm text-muted">Qolgan kreditlar: {creditsLeft}</p>
         )}
       </Card>
+
+      <GeneratingCard active={loading} messages={COPY_STATUS_MESSAGES} />
 
       {variants.map((v, i) => (
         <Card key={i} className="space-y-2">
