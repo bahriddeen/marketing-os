@@ -31,11 +31,8 @@ const OPACITY_MAP = {
   strong: 1,
 } as const;
 
-function getAccentHue(): number {
-  if (typeof window === "undefined") return 160;
-  const accent = getComputedStyle(document.documentElement)
-    .getPropertyValue("--accent")
-    .trim();
+function getAccentHue(el: Element): number {
+  const accent = getComputedStyle(el).getPropertyValue("--accent").trim();
   return accent ? hexToHue(accent) : 160;
 }
 
@@ -108,7 +105,7 @@ export function BeamsBackground({
       ctx.scale(dpr, dpr);
 
       const totalBeams = MINIMUM_BEAMS * 1.5;
-      const baseHue = getAccentHue();
+      const baseHue = getAccentHue(canvas);
       beamsRef.current = Array.from({ length: totalBeams }, () =>
         createBeam(canvas.width, canvas.height, baseHue),
       );
@@ -122,7 +119,7 @@ export function BeamsBackground({
 
       const column = index % 3;
       const spacing = canvas.width / 3;
-      const baseHue = getAccentHue();
+      const baseHue = getAccentHue(canvas);
 
       beam.y = canvas.height + 100;
       beam.x =

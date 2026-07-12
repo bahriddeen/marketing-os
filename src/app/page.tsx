@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import HeroPreview from "@/components/marketing/HeroPreview";
 import Button from "@/components/ui/Button";
-import ThemeToggle from "@/components/ui/ThemeToggle";
 import { BeamsBackground } from "@/components/ui/BeamsBackground";
 import { BookOpen, Calendar, Clapperboard, PenLine } from "lucide-react";
 
@@ -41,13 +40,12 @@ export default async function LandingPage() {
   if (user) redirect("/app");
 
   return (
-    <BeamsBackground className="flex min-h-screen flex-col">
+    <BeamsBackground className="theme-dark-pinned flex min-h-screen flex-col">
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
         <span className="font-display text-lg font-semibold text-ink">
           AI Marketing OS
         </span>
         <nav className="flex items-center gap-6">
-          <ThemeToggle />
           <Link
             href="/login"
             className="text-sm font-medium text-muted hover:text-ink"

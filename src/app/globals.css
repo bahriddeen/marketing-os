@@ -41,7 +41,8 @@
   }
 }
 
-:root[data-theme="dark"] {
+:root[data-theme="dark"],
+.theme-dark-pinned {
   --canvas: #101214;
   --surface: #17191C;
   --ink: #F2F1ED;
