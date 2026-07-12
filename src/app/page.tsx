@@ -7,7 +7,7 @@ import Button from "@/components/ui/Button";
 const MODULES = [
   {
     title: "Brend bilimlar bazasi",
-    body: "Kompaniyangiz haqida bir marta yozing — mahsulotlar, auditoriya, ohang. Sun'iy intellekt keyingi barcha generatsiyalarda shu ma'lumotni ishlatadi, qayta tushuntirishga hojat yo'q.",
+    body: "Kompaniyangiz haqida bir marta yozing — mahsulotlar, auditoriya, ohang. Sun‘iy intellekt keyingi barcha generatsiyalarda shu ma‘lumotni ishlatadi, qayta tushuntirishga hojat yo‘q.",
   },
   {
     title: "Kontent reja",
@@ -15,11 +15,11 @@ const MODULES = [
   },
   {
     title: "Reels generatori",
-    body: "Ssenariy, hook va ovoz ohangi — reels uchun tayyor g'oyalar, brendingiz uslubida.",
+    body: "Ssenariy, boshlanish jumlasi va ovoz ohangi — reels uchun tayyor g‘oyalar, brendingiz uslubida.",
   },
   {
     title: "Kopiraiting",
-    body: "Post, reklama matni yoki SMS — formatga mos, sotuvga yo'naltirilgan matnlarni soniyalarda yarating.",
+    body: "Post, reklama matni yoki SMS — formatga mos, sotuvga yo‘naltirilgan matnlarni soniyalarda yarating.",
   },
 ];
 
@@ -53,11 +53,11 @@ export default async function LandingPage() {
         <section className="grid gap-12 py-16 md:grid-cols-2 md:items-center md:py-24">
           <div>
             <h1 className="font-display text-[2.5rem] font-bold leading-[1.05] tracking-[-0.02em] text-ink sm:text-[3.5rem]">
-              Brendingiz haqida yozing. Tayyor kontentni sun&#39;iy intellekt yozadi.
+              Brendingiz haqida yozing. Tayyor kontentni sun‘iy intellekt yozadi.
             </h1>
             <p className="mt-6 max-w-md text-lg leading-relaxed text-muted">
-              O&#39;zbek marketing va SMM mutaxassislari uchun — brend
-              ma&#39;lumotidan Instagram va Telegram&#39;ga tayyor post, reels
+              O‘zbek marketing va SMM mutaxassislari uchun — brend
+              ma‘lumotidan Instagram va Telegram‘ga tayyor post, reels
               ssenariysi va reklama matni.
             </p>
             <div className="mt-8">

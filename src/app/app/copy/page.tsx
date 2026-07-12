@@ -15,11 +15,11 @@ export default async function CopyPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Kopiraiting</h1>
+      <h1 className="font-display text-2xl font-semibold text-ink">Kopiraiting</h1>
       {brands.length === 0 ? (
-        <p className="text-gray-500">
+        <p className="text-muted">
           Avval brend qo‘shing —{" "}
-          <Link className="underline" href="/app/brands/new">
+          <Link className="font-medium text-accent hover:underline" href="/app/brands/new">
             yangi brend yaratish
           </Link>
         </p>

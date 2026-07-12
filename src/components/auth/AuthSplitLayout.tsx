@@ -17,7 +17,7 @@ export default function AuthSplitLayout({
         </Link>
         <div className="max-w-sm">
           <p className="mb-6 font-display text-2xl font-semibold leading-snug text-white">
-            Brendingiz haqida yozing &mdash; qolganini AI bajaradi.
+            Brendingiz haqida yozing &mdash; qolganini sun&#8216;iy intellekt bajaradi.
           </p>
           <CaptionDemo variant="quiet" />
         </div>

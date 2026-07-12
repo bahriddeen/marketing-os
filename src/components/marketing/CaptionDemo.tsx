@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 
 const CAPTION =
-  "Yangi mavsum boshlandi 🌿\n\nVetline'da endi uy hayvonlaringiz uchun bepul birinchi konsultatsiya. Joy soni cheklangan — hoziroq yozing!\n\n#vetline #toshkent #uyhayvonlari";
+  "Yangi mavsum boshlandi 🌿\n\nVetline‘da endi uy hayvonlaringiz uchun bepul birinchi konsultatsiya. Joy soni cheklangan — hoziroq yozing!\n\n#vetline #toshkent #uyhayvonlari";
 
 export default function CaptionDemo({
   variant = "full",
