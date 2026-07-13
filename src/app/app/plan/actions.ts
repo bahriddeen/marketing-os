@@ -67,3 +67,28 @@ export async function bulkUpdateStatus(
   revalidatePath("/app/plan");
   return { ok: true, updated: (data ?? []).length };
 }
+
+export async function deletePlan(
+  planId: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!z.string().uuid().safeParse(planId).success) {
+    return { ok: false, error: "Plan topilmadi." };
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("content_plans")
+    .delete()
+    .eq("id", planId)
+    .select("id")
+    .maybeSingle();
+  if (error) {
+    return { ok: false, error: "O‘chirib bo‘lmadi. Qayta urinib ko‘ring." };
+  }
+  if (!data) {
+    return { ok: false, error: "Plan topilmadi." };
+  }
+
+  revalidatePath("/app/plan", "layout");
+  return { ok: true };
+}
