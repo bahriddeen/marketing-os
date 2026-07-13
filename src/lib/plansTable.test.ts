@@ -34,6 +34,8 @@ describe("parsePlansParams", () => {
     expect(p.page).toBe(1);
     expect(p.size).toBe(10);
     expect(p.q).toBe("a");
+    expect(parsePlansParams({ page: "Infinity" }).page).toBe(1);
+    expect(parsePlansParams({ page: "1e999" }).page).toBe(1);
   });
 
   it("exports the size whitelist", () => {

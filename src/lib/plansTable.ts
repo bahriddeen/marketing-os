@@ -18,6 +18,7 @@ export function parsePlansParams(
 ): PlansParams {
   const platform = first(sp.platform);
   const size = Number(first(sp.size));
+  const rawPage = Math.floor(Number(first(sp.page)));
   return {
     q: first(sp.q).slice(0, 200),
     brand: first(sp.brand),
@@ -26,7 +27,7 @@ export function parsePlansParams(
     )
       ? (platform as PlanPlatform)
       : "",
-    page: Math.max(1, Math.floor(Number(first(sp.page))) || 1),
+    page: Number.isFinite(rawPage) && rawPage >= 1 ? rawPage : 1,
     size: (PLAN_PAGE_SIZES as readonly number[]).includes(size) ? size : 10,
   };
 }

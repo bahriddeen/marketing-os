@@ -5,7 +5,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import PlansToolbar from "./PlansToolbar";
 import PlansTable, { type PlanRow } from "./PlansTable";
-import { parsePlansParams } from "@/lib/plansTable";
+import { parsePlansParams, buildPlansQuery } from "@/lib/plansTable";
 
 export default async function PlansPage({
   searchParams,
@@ -77,7 +77,7 @@ export default async function PlansPage({
               </Link>
             </Card>
           ) : (
-            <PlansTable plans={plans} params={p} total={total} />
+            <PlansTable key={buildPlansQuery(p) || "default"} plans={plans} params={p} total={total} />
           )}
         </>
       )}
