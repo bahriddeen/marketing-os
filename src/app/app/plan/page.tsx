@@ -3,9 +3,9 @@ import { getOrCreateWorkspace } from "@/lib/workspace";
 import Link from "next/link";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import PostsToolbar from "./PostsToolbar";
-import PostsTable, { type DashboardPost } from "./PostsTable";
-import { parseTableParams, buildTableQuery, PAGE_SIZE } from "@/lib/planTable";
+import PlansToolbar from "./PlansToolbar";
+import PlansTable, { type PlanRow } from "./PlansTable";
+import { parsePlansParams } from "@/lib/plansTable";
 
 export default async function PlansPage({
   searchParams,
@@ -13,7 +13,7 @@ export default async function PlansPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
-  const p = parseTableParams(sp);
+  const p = parsePlansParams(sp);
   const ws = await getOrCreateWorkspace();
   const supabase = await createClient();
 
@@ -25,32 +25,25 @@ export default async function PlansPage({
   const brands = brandsData ?? [];
 
   let query = supabase
-    .from("plan_posts")
-    .select(
-      "id, date, topic, hook, format, status, plan_id, content_plans!inner(title, platform), brands(name)",
-      { count: "exact" }
-    )
+    .from("content_plans")
+    .select("id, title, period_start, post_count, brands(name)", { count: "exact" })
     .eq("workspace_id", ws.id);
 
   if (p.q) {
     const q = p.q.replace(/[,()]/g, " ").trim();
-    if (q) query = query.or(`topic.ilike.%${q}%,hook.ilike.%${q}%`);
+    if (q) query = query.ilike("title", `%${q}%`);
   }
   if (p.brand) query = query.eq("brand_id", p.brand);
-  if (p.status) query = query.eq("status", p.status);
-  if (p.format) query = query.eq("format", p.format);
-  if (p.platform) query = query.eq("content_plans.platform", p.platform);
+  if (p.platform) query = query.eq("platform", p.platform);
 
-  const from = (p.page - 1) * PAGE_SIZE;
+  const from = (p.page - 1) * p.size;
   const { data, count } = await query
-    .order(p.sort, { ascending: p.dir === "asc" })
+    .order("created_at", { ascending: false })
     .order("id", { ascending: true })
-    .range(from, from + PAGE_SIZE - 1);
-  const posts = (data ?? []) as unknown as DashboardPost[];
+    .range(from, from + p.size - 1);
+  const plans = (data ?? []) as unknown as PlanRow[];
   const total = count ?? 0;
-  const lastPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const hasFilters =
-    !!p.q || !!p.brand || !!p.status || !!p.format || !!p.platform;
+  const hasFilters = !!p.q || !!p.brand || !!p.platform;
 
   return (
     <div className="space-y-5">
@@ -75,8 +68,8 @@ export default async function PlansPage({
         </Card>
       ) : (
         <>
-          <PostsToolbar brands={brands} params={p} />
-          {posts.length === 0 ? (
+          <PlansToolbar brands={brands} params={p} />
+          {plans.length === 0 ? (
             <Card className="text-center">
               <p className="text-muted">Hech narsa topilmadi.</p>
               <Link href="/app/plan" className="mt-4 inline-block">
@@ -84,38 +77,7 @@ export default async function PlansPage({
               </Link>
             </Card>
           ) : (
-            <>
-              <PostsTable
-                key={buildTableQuery(p) || "default"}
-                posts={posts}
-                params={p}
-              />
-              <div className="flex items-center justify-between text-sm text-muted">
-                <span className="font-mono tabular-nums">
-                  {from + 1}–{Math.min(from + PAGE_SIZE, total)} / {total}
-                </span>
-                <div className="flex gap-2">
-                  {p.page > 1 ? (
-                    <Link href={`/app/plan${buildTableQuery(p, { page: p.page - 1 })}`}>
-                      <Button variant="ghost">← Oldingi</Button>
-                    </Link>
-                  ) : (
-                    <Button variant="ghost" disabled>
-                      ← Oldingi
-                    </Button>
-                  )}
-                  {p.page < lastPage ? (
-                    <Link href={`/app/plan${buildTableQuery(p, { page: p.page + 1 })}`}>
-                      <Button variant="ghost">Keyingi →</Button>
-                    </Link>
-                  ) : (
-                    <Button variant="ghost" disabled>
-                      Keyingi →
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </>
+            <PlansTable plans={plans} params={p} total={total} />
           )}
         </>
       )}
