@@ -19,6 +19,11 @@ export default function PostsToolbar({
 }) {
   const router = useRouter();
   const [q, setQ] = useState(params.q);
+  const [prevQ, setPrevQ] = useState(params.q);
+  if (params.q !== prevQ) {
+    setPrevQ(params.q);
+    if (params.q === "") setQ("");
+  }
   const [, startTransition] = useTransition();
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
