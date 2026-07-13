@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { buildBrandContext } from "./prompts";
 import { CREDIT_WEIGHTS } from "./credits";
-import { CopyVariantsSchema, ContentPlanSchema } from "./schemas";
+import { CopyVariantsSchema, ContentPlanSchema, ReelsSchema } from "./schemas";
 import type { Brand } from "@/lib/types";
 
 const brand: Brand = {
@@ -87,5 +87,52 @@ describe("ContentPlanSchema", () => {
 
   it("rejects empty posts", () => {
     expect(ContentPlanSchema.safeParse({ title: "t", posts: [] }).success).toBe(false);
+  });
+});
+
+describe("ReelsSchema", () => {
+  const variant = (persona: "expert" | "emotional" | "sales") => ({
+    persona,
+    hook: "Birinchi 3 soniyada diqqatni tortadigan jumla",
+    scenes: ["0-3s: mahsulot yaqindan ko‘rsatiladi", "3-10s: foydalanish jarayoni"],
+    voiceover: "Ovoz matni shu yerda",
+    caption: "Caption matni",
+    cta: "Batafsil ma‘lumot uchun yozing",
+    duration: "15–20 soniya",
+  });
+
+  it("accepts exactly 3 variants with distinct personas", () => {
+    const r = ReelsSchema.safeParse({
+      variants: [variant("expert"), variant("emotional"), variant("sales")],
+    });
+    expect(r.success).toBe(true);
+  });
+
+  it("rejects fewer than 3 variants", () => {
+    expect(
+      ReelsSchema.safeParse({ variants: [variant("expert"), variant("emotional")] }).success
+    ).toBe(false);
+  });
+
+  it("rejects more than 3 variants", () => {
+    expect(
+      ReelsSchema.safeParse({
+        variants: [variant("expert"), variant("emotional"), variant("sales"), variant("expert")],
+      }).success
+    ).toBe(false);
+  });
+
+  it("rejects an invalid persona value", () => {
+    const bad = { ...variant("expert"), persona: "funny" };
+    expect(
+      ReelsSchema.safeParse({ variants: [bad, variant("emotional"), variant("sales")] }).success
+    ).toBe(false);
+  });
+
+  it("rejects an empty scenes array", () => {
+    const bad = { ...variant("expert"), scenes: [] };
+    expect(
+      ReelsSchema.safeParse({ variants: [bad, variant("emotional"), variant("sales")] }).success
+    ).toBe(false);
   });
 });

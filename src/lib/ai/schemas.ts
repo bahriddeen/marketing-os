@@ -33,3 +33,22 @@ export const BrandFillSchema = z.object({
   brand_values: z.string(),
 });
 export type BrandFill = z.infer<typeof BrandFillSchema>;
+
+export const ReelsPersonas = ["expert", "emotional", "sales"] as const;
+export type ReelsPersona = (typeof ReelsPersonas)[number];
+
+export const ReelsVariantSchema = z.object({
+  persona: z.enum(ReelsPersonas),
+  hook: z.string(),
+  scenes: z.array(z.string()).min(1),
+  voiceover: z.string(),
+  caption: z.string(),
+  cta: z.string(),
+  duration: z.string(),
+});
+export type ReelsVariant = z.infer<typeof ReelsVariantSchema>;
+
+export const ReelsSchema = z.object({
+  variants: z.array(ReelsVariantSchema).length(3),
+});
+export type ReelsOutput = z.infer<typeof ReelsSchema>;
