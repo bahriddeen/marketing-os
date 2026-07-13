@@ -99,7 +99,7 @@ export default function PostsTable({
           <Select
             value={bulkStatus}
             onChange={(e) => setBulkStatus(e.target.value as PlanStatus)}
-            className="w-auto"
+            className="w-auto!"
             aria-label="Yangi holat"
           >
             {Object.entries(PLAN_STATUS_LABELS).map(([k, label]) => (

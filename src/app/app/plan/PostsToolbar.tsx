@@ -67,7 +67,7 @@ export default function PostsToolbar({
       <Select
         value={params.brand}
         onChange={(e) => apply({ brand: e.target.value })}
-        className="w-auto"
+        className="w-auto!"
         aria-label="Brend"
       >
         <option value="">Barcha brendlar</option>
@@ -80,7 +80,7 @@ export default function PostsToolbar({
       <Select
         value={params.status}
         onChange={(e) => apply({ status: e.target.value as TableParams["status"] })}
-        className="w-auto"
+        className="w-auto!"
         aria-label="Holat"
       >
         <option value="">Barcha holatlar</option>
@@ -93,7 +93,7 @@ export default function PostsToolbar({
       <Select
         value={params.format}
         onChange={(e) => apply({ format: e.target.value as TableParams["format"] })}
-        className="w-auto"
+        className="w-auto!"
         aria-label="Format"
       >
         <option value="">Barcha formatlar</option>
@@ -106,7 +106,7 @@ export default function PostsToolbar({
       <Select
         value={params.platform}
         onChange={(e) => apply({ platform: e.target.value as TableParams["platform"] })}
-        className="w-auto"
+        className="w-auto!"
         aria-label="Platforma"
       >
         <option value="">Barcha platformalar</option>
