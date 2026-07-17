@@ -29,7 +29,12 @@ export const getOrCreateWorkspace = cache(async (): Promise<Workspace> => {
 
   const { data: ws, error } = await supabase
     .from("workspaces")
-    .insert({ name: "Mening jamoam", owner_id: user.id, plan: "trial" })
+    .insert({
+      name: "Mening jamoam",
+      owner_id: user.id,
+      plan: "trial",
+      owner_email: user.email ?? null,
+    })
     .select()
     .single();
   if (error) throw error;

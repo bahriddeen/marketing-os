@@ -4,6 +4,7 @@ export type Workspace = {
   id: string;
   name: string;
   owner_id: string;
+  owner_email: string | null;
   plan: "trial" | "starter" | "professional" | "agency";
   plan_expires_at: string | null;
 };
