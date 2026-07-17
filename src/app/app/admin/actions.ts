@@ -53,3 +53,33 @@ export async function voidCode(codeId: string): Promise<{ ok: true } | { ok: fal
   revalidatePath("/app/admin");
   return { ok: true };
 }
+
+const AddCreditSchema = z.object({
+  workspaceId: z.string().uuid(),
+  amount: z.number().int().refine((n) => n !== 0, "amount must be non-zero"),
+  note: z.string().trim().optional(),
+});
+
+export async function addCredit(
+  workspaceId: string,
+  amount: number,
+  note: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const parsed = AddCreditSchema.safeParse({ workspaceId, amount, note });
+  if (!parsed.success) {
+    return { ok: false, error: "Noto‘g‘ri qiymat." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_add_credit", {
+    p_workspace_id: parsed.data.workspaceId,
+    p_amount: parsed.data.amount,
+    p_note: parsed.data.note || null,
+  });
+  if (error) {
+    return { ok: false, error: "Kredit qo‘shib bo‘lmadi." };
+  }
+
+  revalidatePath("/app/admin");
+  return { ok: true };
+}
