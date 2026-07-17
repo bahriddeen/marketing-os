@@ -406,10 +406,10 @@ import { getOrCreateWorkspace } from "@/lib/workspace";
 const RedeemSchema = z.object({ code: z.string().trim().min(1) });
 
 const REDEEM_ERRORS: Record<string, string> = {
-  not_found: "Kod noto'g'ri.",
+  not_found: "Kod noto‘g‘ri.",
   already_redeemed: "Bu kod allaqachon ishlatilgan.",
   void: "Bu kod bekor qilingan.",
-  unauthorized: "Ruxsat yo'q.",
+  unauthorized: "Ruxsat yo‘q.",
 };
 
 export async function redeemCode(
@@ -431,7 +431,7 @@ export async function redeemCode(
   });
 
   if (error) {
-    return { ok: false, error: "Xatolik yuz berdi. Qayta urinib ko'ring." };
+    return { ok: false, error: "Xatolik yuz berdi. Qayta urinib ko‘ring." };
   }
 
   const result = data as {
@@ -444,7 +444,7 @@ export async function redeemCode(
   if (!result.ok) {
     return {
       ok: false,
-      error: REDEEM_ERRORS[result.error ?? ""] ?? "Kodni tasdiqlab bo'lmadi.",
+      error: REDEEM_ERRORS[result.error ?? ""] ?? "Kodni tasdiqlab bo‘lmadi.",
     };
   }
 
@@ -473,7 +473,7 @@ import { calculateTopupPriceUzs } from "@/lib/billing";
 import { redeemCode } from "./actions";
 
 function formatUzs(amount: number): string {
-  return new Intl.NumberFormat("uz-UZ").format(amount) + " so'm";
+  return new Intl.NumberFormat("uz-UZ").format(amount) + " so‘m";
 }
 
 export function TopupCalculator() {
@@ -513,7 +513,7 @@ export function RedeemCodeForm() {
         setSuccess(
           res.type === "subscription"
             ? `Tarif faollashtirildi: ${res.plan}, +${res.credits} kredit.`
-            : `+${res.credits} kredit qo'shildi.`
+            : `+${res.credits} kredit qo‘shildi.`
         );
         setCode("");
         router.refresh();
@@ -592,10 +592,10 @@ export default async function UpgradePage() {
       </Card>
 
       <Card className="space-y-3">
-        <h2 className="font-display text-lg font-semibold text-ink">To'lov</h2>
+        <h2 className="font-display text-lg font-semibold text-ink">To‘lov</h2>
         <p className="text-sm text-muted">
-          Tarif yoki kredit sotib olish uchun {ADMIN_CONTACT_PHONE} raqamiga qo'ng'iroq qiling.
-          To'lovni tasdiqlagach, sizga faollashtirish kodi beriladi — uni pastdagi maydonga
+          Tarif yoki kredit sotib olish uchun {ADMIN_CONTACT_PHONE} raqamiga qo‘ng‘iroq qiling.
+          To‘lovni tasdiqlagach, sizga faollashtirish kodi beriladi — uni pastdagi maydonga
           kiriting.
         </p>
         <RedeemCodeForm />
@@ -688,7 +688,7 @@ export async function generateCode(
 ): Promise<{ ok: true; code: string } | { ok: false; error: string }> {
   const parsed = GenerateCodeSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: "Noto'g'ri qiymat." };
+    return { ok: false, error: "Noto‘g‘ri qiymat." };
   }
 
   const supabase = await createClient();
@@ -703,7 +703,7 @@ export async function generateCode(
 
   const { data, error } = await supabase.rpc("admin_generate_code", rpcParams);
   if (error || !data) {
-    return { ok: false, error: "Kod yaratib bo'lmadi. Admin huquqini tekshiring." };
+    return { ok: false, error: "Kod yaratib bo‘lmadi. Admin huquqini tekshiring." };
   }
 
   revalidatePath("/app/admin");
@@ -715,13 +715,13 @@ const VoidCodeSchema = z.object({ codeId: z.string().uuid() });
 export async function voidCode(codeId: string): Promise<{ ok: true } | { ok: false; error: string }> {
   const parsed = VoidCodeSchema.safeParse({ codeId });
   if (!parsed.success) {
-    return { ok: false, error: "Noto'g'ri kod." };
+    return { ok: false, error: "Noto‘g‘ri kod." };
   }
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("admin_void_code", { p_code_id: parsed.data.codeId });
   if (error || data !== true) {
-    return { ok: false, error: "Kodni bekor qilib bo'lmadi." };
+    return { ok: false, error: "Kodni bekor qilib bo‘lmadi." };
   }
 
   revalidatePath("/app/admin");
@@ -873,7 +873,7 @@ export async function addCredit(
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const parsed = AddCreditSchema.safeParse({ workspaceId, amount, note });
   if (!parsed.success) {
-    return { ok: false, error: "Noto'g'ri qiymat." };
+    return { ok: false, error: "Noto‘g‘ri qiymat." };
   }
 
   const supabase = await createClient();
@@ -883,7 +883,7 @@ export async function addCredit(
     p_note: parsed.data.note || null,
   });
   if (error) {
-    return { ok: false, error: "Kredit qo'shib bo'lmadi." };
+    return { ok: false, error: "Kredit qo‘shib bo‘lmadi." };
   }
 
   revalidatePath("/app/admin");
@@ -1014,7 +1014,7 @@ export default function WorkspaceDirectory({ workspaces }: { workspaces: Workspa
     <Card className="space-y-3">
       <h2 className="font-display text-lg font-semibold text-ink">Ish maydonlari</h2>
       <Input
-        placeholder="Email bo'yicha qidirish"
+        placeholder="Email bo‘yicha qidirish"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
@@ -1045,7 +1045,7 @@ export default function WorkspaceDirectory({ workspaces }: { workspaces: Workspa
                       }
                     />
                     <Button variant="secondary" disabled={pending} onClick={() => onAdd(w.id)}>
-                      Qo'shish
+                      Qo‘shish
                     </Button>
                   </div>
                 </td>
@@ -1158,7 +1158,7 @@ As a different, non-admin logged-in user (a second test account/workspace):
 
 - [ ] **Step 4: Verify top-up code redemption**
 
-5. As admin, generate a top-up code for 25 credits. Redeem it as a user. Expected: success message "+25 kredit qo'shildi."; `workspaces.plan` is unchanged; `credit_ledger` has a `+25` row with `reason = 'code_redeem'`.
+5. As admin, generate a top-up code for 25 credits. Redeem it as a user. Expected: success message "+25 kredit qo‘shildi."; `workspaces.plan` is unchanged; `credit_ledger` has a `+25` row with `reason = 'code_redeem'`.
 
 - [ ] **Step 5: Verify admin-only enforcement at the database layer**
 
@@ -1166,11 +1166,11 @@ As a different, non-admin logged-in user (a second test account/workspace):
    ```js
    fetch("/_supabase_placeholder") // skip — instead:
    ```
-   Simpler: confirm via the UI that visiting `/app/admin` directly as the non-admin user redirects to `/app` (already covered in Task 5 Step 5) — this proves the layout guard. To confirm the *database* also rejects it (defense in depth, not just the route), as the non-admin user's session, temporarily comment out the `redirect` line in `src/app/app/admin/layout.tsx`, reload `/app/admin`, and attempt to generate a code. Expected: `generateCode` returns `{ ok: false, error: "Kod yaratib bo'lmadi. Admin huquqini tekshiring." }` because `admin_generate_code` raises `not authorized`. Revert the temporary edit afterward (`git checkout -- src/app/app/admin/layout.tsx`).
+   Simpler: confirm via the UI that visiting `/app/admin` directly as the non-admin user redirects to `/app` (already covered in Task 5 Step 5) — this proves the layout guard. To confirm the *database* also rejects it (defense in depth, not just the route), as the non-admin user's session, temporarily comment out the `redirect` line in `src/app/app/admin/layout.tsx`, reload `/app/admin`, and attempt to generate a code. Expected: `generateCode` returns `{ ok: false, error: "Kod yaratib bo‘lmadi. Admin huquqini tekshiring." }` because `admin_generate_code` raises `not authorized`. Revert the temporary edit afterward (`git checkout -- src/app/app/admin/layout.tsx`).
 
 - [ ] **Step 6: Verify direct admin credit grant**
 
-7. As admin on `/app/admin`, find the non-admin test workspace in the workspace directory, enter an amount (e.g. `10`) and click "Qo'shish". Expected: balance column updates after refresh; `credit_ledger` has a new `+10` row with `reason = 'admin_adjust'` and `note = 'admin panel'`.
+7. As admin on `/app/admin`, find the non-admin test workspace in the workspace directory, enter an amount (e.g. `10`) and click "Qo‘shish". Expected: balance column updates after refresh; `credit_ledger` has a new `+10` row with `reason = 'admin_adjust'` and `note = 'admin panel'`.
 
 - [ ] **Step 7: Verify code voiding**
 
