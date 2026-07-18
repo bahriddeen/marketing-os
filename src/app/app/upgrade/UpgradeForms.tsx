@@ -7,7 +7,10 @@ import { calculateTopupPriceUzs } from "@/lib/billing";
 import { redeemCode } from "./actions";
 
 function formatUzs(amount: number): string {
-  return new Intl.NumberFormat("uz-UZ").format(amount) + " so‘m";
+  // Intl.NumberFormat("uz-UZ") renders a different thousands separator on
+  // the server (Node's ICU data) than in the browser, causing a hydration
+  // mismatch. A manual, locale-independent formatter is deterministic.
+  return Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " so‘m";
 }
 
 export function TopupCalculator() {
