@@ -12,7 +12,6 @@ const NAV = [
   { href: "/app/plan", label: "Kontent-plan", icon: CalendarDays, exact: false },
   { href: "/app/copy", label: "Kopiraiting", icon: PenLine, exact: false },
   { href: "/app/reels", label: "Reels", icon: Clapperboard, exact: false },
-  { href: "/app/upgrade", label: "Tarif", icon: CreditCard, exact: false },
 ];
 
 export default function Sidebar({ credits }: { credits: number }) {
@@ -46,8 +45,20 @@ export default function Sidebar({ credits }: { credits: number }) {
         })}
       </nav>
       <div className="flex items-center gap-3 md:mt-auto md:flex-col md:items-stretch md:gap-3 md:pt-4">
-        <div className="md:self-start">
+        <div className="flex items-center gap-2 md:self-start">
           <ThemeToggle />
+          <Link
+            href="/app/upgrade"
+            aria-label="Tarif"
+            className={`flex items-center gap-2.5 rounded-[0.625rem] px-3 py-2 text-sm font-medium transition-colors ${
+              pathname.startsWith("/app/upgrade")
+                ? "bg-accent-soft text-accent"
+                : "text-muted hover:bg-canvas hover:text-ink"
+            }`}
+          >
+            <CreditCard size={18} strokeWidth={1.75} />
+            <span className="hidden md:inline">Tarif</span>
+          </Link>
         </div>
         <div className="hidden rounded-[0.625rem] bg-canvas px-3 py-2.5 md:block">
           <p className="text-xs text-muted">Kreditlar</p>
