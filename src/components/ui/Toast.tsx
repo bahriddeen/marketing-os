@@ -4,6 +4,7 @@ import {
   useCallback,
   useContext,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
@@ -18,8 +19,22 @@ const ToastContext = createContext<{
 
 let nextId = 0;
 
+const noopSubscribe = () => () => {};
+
+// Server always renders "not mounted"; the client's first (hydration) render
+// matches that, then re-renders once actually mounted in the browser. This
+// avoids a hydration mismatch from the portal only existing client-side.
+function useMounted() {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false
+  );
+}
+
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const mounted = useMounted();
 
   const dismiss = useCallback((id: number) => {
     setToasts((items) => items.filter((item) => item.id !== id));
@@ -37,7 +52,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ show }}>
       {children}
-      {typeof document !== "undefined" &&
+      {mounted &&
         createPortal(
           <div
             aria-live="polite"
