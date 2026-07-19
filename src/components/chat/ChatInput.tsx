@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { parseSSEFrames } from "@/lib/chatStream";
+import Button from "@/components/ui/Button";
 
 interface ChatInputProps {
   conversationId: string;
@@ -118,13 +119,13 @@ export function ChatInput({
           className="flex-1 resize-none rounded border border-line bg-canvas px-3 py-2 text-sm disabled:opacity-50"
           rows={3}
         />
-        <button
+        <Button
           onClick={handleSend}
           disabled={loading || !message.trim() || isReadOnly || creditsLeft < 1}
-          className="self-end rounded bg-accent px-4 py-2 text-ink font-semibold disabled:opacity-50 h-fit"
+          className="self-end h-fit"
         >
           {loading ? "Yuborilnyapti..." : "Yuborish"}
-        </button>
+        </Button>
       </div>
     </div>
   );

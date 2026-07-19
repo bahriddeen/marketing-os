@@ -33,7 +33,7 @@ export function MessageThread({ messages }: MessageThreadProps) {
             <div
               className={`max-w-xs rounded-lg px-4 py-2 ${
                 msg.role === "user"
-                  ? "bg-accent text-ink"
+                  ? "bg-accent text-white"
                   : "bg-canvas-soft text-ink border border-line"
               }`}
             >

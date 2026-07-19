@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { uz } from "date-fns/locale";
+import Button from "@/components/ui/Button";
 
 type ChatConversationRow = {
   id: string;
@@ -43,8 +44,8 @@ export async function ConversationListComponent({ workspaceId }: { workspaceId: 
     return (
       <div className="rounded-lg border border-line bg-canvas-soft p-8 text-center">
         <p className="text-muted mb-4">Suhbatlarni yarating va brainstorm qiling</p>
-        <Link href="/app/chat/new" className="inline-block rounded bg-accent px-4 py-2 text-ink">
-          Yangi suhbat
+        <Link href="/app/chat/new" className="inline-block">
+          <Button>Yangi suhbat</Button>
         </Link>
       </div>
     );
