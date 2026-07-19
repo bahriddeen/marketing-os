@@ -7,7 +7,7 @@ export default function ConfirmDialog({
   title,
   description,
   confirmLabel = "Ha",
-  cancelLabel = "Yo'q",
+  cancelLabel = "Yo‘q",
   onConfirm,
   onCancel,
   variant = "danger",
