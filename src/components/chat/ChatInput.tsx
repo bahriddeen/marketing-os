@@ -64,7 +64,7 @@ export function ChatInput({
       {error && <div className="rounded bg-danger-soft border border-danger p-2 text-sm text-danger">{error}</div>}
       {isReadOnly && (
         <div className="rounded bg-warn-soft border border-warn p-2 text-sm text-warn">
-          Brend o’chirilgan. Suhbatni ko’rishingiz mumkin lekin yangi xabar yubora olmaysiz.
+          Brend o‘chirilgan. Suhbatni ko‘rishingiz mumkin lekin yangi xabar yubora olmaysiz.
         </div>
       )}
       <div className="flex gap-2">

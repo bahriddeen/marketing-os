@@ -152,7 +152,7 @@ export default function ConversationPage() {
           onClick={handleDelete}
           className="text-danger hover:opacity-80 text-sm"
         >
-          O’chirish
+          O‘chirish
         </button>
       </div>
 
