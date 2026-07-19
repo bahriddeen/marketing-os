@@ -6,12 +6,21 @@ export default function Modal({
   open,
   onClose,
   children,
+  titleId,
+  descriptionId,
 }: {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
+  titleId?: string;
+  descriptionId?: string;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -24,7 +33,7 @@ export default function Modal({
 
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") {
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (e.key !== "Tab" || !focusable || focusable.length === 0) return;
@@ -44,7 +53,7 @@ export default function Modal({
       document.removeEventListener("keydown", onKeyDown);
       trigger?.focus();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 
@@ -59,6 +68,8 @@ export default function Modal({
         ref={panelRef}
         role="dialog"
         aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
         className="relative w-full max-w-sm rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.08)]"
       >
         {children}
