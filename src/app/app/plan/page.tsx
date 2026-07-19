@@ -60,8 +60,8 @@ export default async function PlansPage({
       {total === 0 && !hasFilters ? (
         <EmptyState
           icon={CalendarDays}
-          title="Hali kontent-planingiz yo’q."
-          description="Brend tanlang — sun’iy intellekt bir oylik plan tuzib beradi."
+          title="Hali kontent-planingiz yo‘q."
+          description="Brend tanlang — sun‘iy intellekt bir oylik plan tuzib beradi."
           action={
             <Link href="/app/plan/new">
               <Button>Birinchi planni yaratish</Button>
