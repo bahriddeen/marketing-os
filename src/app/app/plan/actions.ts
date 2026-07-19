@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { PLAN_STATUS_VALUES } from "@/lib/plans";
+import { addDays } from "@/lib/calendar";
 
 const PostEditSchema = z
   .object({
@@ -66,6 +67,53 @@ export async function bulkUpdateStatus(
 
   revalidatePath("/app/plan");
   return { ok: true, updated: (data ?? []).length };
+}
+
+const BulkShiftDatesSchema = z.object({
+  ids: z.array(z.string().uuid()).min(1).max(100),
+  days: z.number().int(),
+});
+
+export async function bulkShiftDates(
+  ids: string[],
+  days: number
+): Promise<{ ok: true; updated: number } | { ok: false; error: string }> {
+  const parsed = BulkShiftDatesSchema.safeParse({ ids, days });
+  if (!parsed.success) {
+    return { ok: false, error: "Noto'g'ri so'rov." };
+  }
+
+  const supabase = await createClient();
+
+  // Fetch all posts to shift
+  const { data: posts, error: fetchError } = await supabase
+    .from("plan_posts")
+    .select("id, date")
+    .in("id", parsed.data.ids);
+
+  if (fetchError || !posts) {
+    return { ok: false, error: "Postlarni yuklashda muammo." };
+  }
+
+  // Shift dates in memory
+  const updates = posts.map((post) => ({
+    id: post.id,
+    date: addDays(post.date, parsed.data.days),
+    updated_at: new Date().toISOString(),
+  }));
+
+  // Upsert all posts with new dates
+  const { error: updateError, count } = await supabase
+    .from("plan_posts")
+    .upsert(updates, { onConflict: "id" })
+    .select("id");
+
+  if (updateError) {
+    return { ok: false, error: "Saqlab bo'lmadi. Qayta urinib ko'ring." };
+  }
+
+  revalidatePath("/app/plan");
+  return { ok: true, updated: (count ?? 0) };
 }
 
 export async function deletePlan(
