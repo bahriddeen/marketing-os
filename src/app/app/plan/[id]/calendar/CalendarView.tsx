@@ -1,11 +1,15 @@
+// src/app/app/plan/[id]/calendar/CalendarView.tsx
 'use client';
 
-import { useState, useCallback } from 'react';
-import { getMonthDays, formatDateKey } from '@/lib/calendar';
+import { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { getMonthDays, formatDateKey, detectDateConflicts } from '@/lib/calendar';
+import { bulkShiftDates, bulkUpdateStatus } from '@/app/app/plan/actions';
 import CalendarHeader from './CalendarHeader';
 import PostCard from './PostCard';
 import BulkActionsBar from './BulkActionsBar';
 import type { PlanPostRow } from '@/lib/types';
+import type { PlanStatus } from '@/lib/plans';
 
 interface CalendarViewProps {
   initialPosts: PlanPostRow[];
@@ -17,6 +21,12 @@ export default function CalendarView({ initialPosts, planId }: CalendarViewProps
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
   const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    setPosts(initialPosts);
+  }, [initialPosts]);
 
   const handleSelectPost = useCallback((postId: string, selected: boolean) => {
     setSelectedPostIds((prev) => {
@@ -38,6 +48,48 @@ export default function CalendarView({ initialPosts, planId }: CalendarViewProps
     }
   }, [posts, selectedPostIds]);
 
+  const handleShiftDates = useCallback(
+    async (days: number) => {
+      if (selectedPostIds.size === 0) return;
+
+      const conflicts = detectDateConflicts(posts, selectedPostIds, days);
+      if (conflicts.length > 0) {
+        setError(
+          `${conflicts.length} ta post boshqa postlar bilan bir sanaga tushib qoladi. Boshqa kun sonini tanlang.`
+        );
+        return;
+      }
+
+      const result = await bulkShiftDates(Array.from(selectedPostIds), days);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+
+      setSelectedPostIds(new Set());
+      setError(null);
+      router.refresh();
+    },
+    [selectedPostIds, posts, router]
+  );
+
+  const handleChangeStatus = useCallback(
+    async (status: PlanStatus) => {
+      if (selectedPostIds.size === 0) return;
+
+      const result = await bulkUpdateStatus(Array.from(selectedPostIds), status);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+
+      setSelectedPostIds(new Set());
+      setError(null);
+      router.refresh();
+    },
+    [selectedPostIds, router]
+  );
+
   const postsByDate = new Map<string, PlanPostRow[]>();
   posts.forEach((post) => {
     const key = post.date;
@@ -52,6 +104,12 @@ export default function CalendarView({ initialPosts, planId }: CalendarViewProps
 
   return (
     <div className="flex flex-col gap-4">
+      {error && (
+        <div className="rounded bg-danger-soft p-3 text-sm text-danger">
+          {error}
+        </div>
+      )}
+
       <CalendarHeader
         currentDate={currentDate}
         onDateChange={setCurrentDate}
@@ -121,12 +179,8 @@ export default function CalendarView({ initialPosts, planId }: CalendarViewProps
         selectedCount={selectedPostIds.size}
         totalCount={posts.length}
         onSelectAll={handleSelectAll}
-        onShiftDates={(days) => {
-          console.log('Shift by', days, 'days');
-        }}
-        onChangeStatus={(status) => {
-          console.log('Change status to', status);
-        }}
+        onShiftDates={handleShiftDates}
+        onChangeStatus={handleChangeStatus}
         onClear={() => setSelectedPostIds(new Set())}
       />
     </div>
