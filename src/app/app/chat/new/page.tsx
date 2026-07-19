@@ -14,6 +14,7 @@ export default function NewConversationPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [selectedBrandId, setSelectedBrandId] = useState("");
   const [workspaceId, setWorkspaceId] = useState("");
+  const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const router = useRouter();
@@ -21,6 +22,12 @@ export default function NewConversationPage() {
 
   useEffect(() => {
     async function loadData() {
+      // Load current user id
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData?.user?.id) {
+        setUserId(userData.user.id);
+      }
+
       // Load workspace_id
       const { data: wsData } = await supabase
         .from("workspace_members")
@@ -51,7 +58,7 @@ export default function NewConversationPage() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedBrandId || !workspaceId) return;
+    if (!selectedBrandId || !workspaceId || !userId) return;
 
     setCreating(true);
     const { data, error } = await supabase
@@ -59,6 +66,7 @@ export default function NewConversationPage() {
       .insert({
         brand_id: selectedBrandId,
         workspace_id: workspaceId,
+        user_id: userId,
         title: null,
       })
       .select("id")
@@ -67,7 +75,7 @@ export default function NewConversationPage() {
     if (!error && data) {
       router.push(`/app/chat/${data.id}`);
     } else {
-      alert("Suhbat yaratishda xato: " + (error?.message || "Noma‘lum xato"));
+      alert("Suhbat yaratishda xato yuz berdi. Qayta urinib ko‘ring.");
       setCreating(false);
     }
   };

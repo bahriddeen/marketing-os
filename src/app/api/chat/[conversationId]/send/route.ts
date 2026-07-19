@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getOrCreateWorkspace, getCreditBalance } from "@/lib/workspace";
 import { runStructuredGeneration } from "@/lib/ai/engine";
 import { chatInstructions, ChatResponseSchema } from "@/lib/ai/modules/chat";
+import { buildBrandContext } from "@/lib/ai/prompts";
 import type { Brand } from "@/lib/types";
 
 export async function POST(
@@ -10,7 +11,13 @@ export async function POST(
   { params }: { params: Promise<{ conversationId: string }> }
 ) {
   const { conversationId } = await params;
-  const { message } = await req.json();
+
+  let message: unknown;
+  try {
+    ({ message } = await req.json());
+  } catch {
+    return NextResponse.json({ ok: false, error: "Noto‘g‘ri so‘rov." }, { status: 400 });
+  }
 
   if (!message || String(message).trim().length === 0) {
     return NextResponse.json({ ok: false, error: "Xabar bo‘sh bo‘lishi mumkin emas." }, { status: 400 });
@@ -57,7 +64,7 @@ export async function POST(
     return NextResponse.json({ ok: false, error: "Kreditlar yetarli emas. Tarifni yangilang." }, { status: 402 });
   }
 
-  // Fetch conversation history
+  // Fetch conversation history (turns prior to this one)
   const { data: messages } = await supabase
     .from("chat_messages")
     .select("role, content")
@@ -71,25 +78,9 @@ export async function POST(
 
   const userInput = historyText ? `${historyText}\nUser: ${message}` : `User: ${message}`;
 
-  // Generate response
-  const result = await runStructuredGeneration({
-    workspaceId: ws.id,
-    userId: user.id,
-    brandId: brand.id,
-    module: "chat",
-    brandContext: (await import("@/lib/ai/prompts")).buildBrandContext(brand as Brand),
-    moduleInstructions: chatInstructions(brand.name),
-    userInput,
-    inputRecord: { conversationId, message },
-    schema: ChatResponseSchema,
-    maxTokens: 2048,
-  });
-
-  if (!result.ok) {
-    return NextResponse.json(result, { status: 500 });
-  }
-
-  // Insert user message
+  // Persist the user's message before spending any credit, so a failed
+  // generation never loses it (matches the documented error-handling table:
+  // "AI call fails -> user message kept, no credit spent").
   const { error: userMsgError } = await supabase
     .from("chat_messages")
     .insert({
@@ -102,6 +93,24 @@ export async function POST(
     return NextResponse.json({ ok: false, error: "Xabar saqlashda xato." }, { status: 500 });
   }
 
+  // Generate response
+  const result = await runStructuredGeneration({
+    workspaceId: ws.id,
+    userId: user.id,
+    brandId: brand.id,
+    module: "chat",
+    brandContext: buildBrandContext(brand as Brand),
+    moduleInstructions: chatInstructions(brand.name),
+    userInput,
+    inputRecord: { conversationId, message },
+    schema: ChatResponseSchema,
+    maxTokens: 2048,
+  });
+
+  if (!result.ok) {
+    return NextResponse.json(result, { status: 500 });
+  }
+
   // Insert assistant response
   const { error: assistantMsgError } = await supabase
     .from("chat_messages")
@@ -112,7 +121,10 @@ export async function POST(
     });
 
   if (assistantMsgError) {
-    return NextResponse.json({ ok: false, error: "Javob saqlashda xato." }, { status: 500 });
+    // Credit is already spent and the reply was generated — surface it to
+    // the user rather than discarding a paid-for response. It just won't
+    // be part of the persisted thread until they retry.
+    console.error("failed to persist assistant message", assistantMsgError);
   }
 
   return NextResponse.json({

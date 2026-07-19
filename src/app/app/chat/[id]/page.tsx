@@ -162,7 +162,7 @@ export default function ConversationPage() {
     if (!error) {
       router.push("/app/chat");
     } else {
-      alert("O‘chirishda xato: " + error.message);
+      alert("Suhbatni o‘chirishda xato yuz berdi. Qayta urinib ko‘ring.");
     }
   };
 
