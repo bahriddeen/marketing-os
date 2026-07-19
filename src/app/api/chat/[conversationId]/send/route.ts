@@ -13,7 +13,7 @@ export async function POST(
   const { message } = await req.json();
 
   if (!message || String(message).trim().length === 0) {
-    return NextResponse.json({ ok: false, error: "Xabar bo'sh bo'lishi mumkin emas." }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "Xabar bo‘sh bo‘lishi mumkin emas." }, { status: 400 });
   }
 
   if (String(message).length > 10000) {
@@ -48,7 +48,7 @@ export async function POST(
     .single();
 
   if (!brand) {
-    return NextResponse.json({ ok: false, error: "Brend o'chirilgan. Suhbatni ko'rishingiz mumkin lekin yangi xabar yubora olmaysiz." }, { status: 410 });
+    return NextResponse.json({ ok: false, error: "Brend o‘chirilgan. Suhbatni ko‘rishingiz mumkin lekin yangi xabar yubora olmaysiz." }, { status: 410 });
   }
 
   // Check credit balance
