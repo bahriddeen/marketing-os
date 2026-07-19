@@ -33,7 +33,7 @@ Every user message triggers a generation via `runStructuredGeneration()`:
 - **Module:** `"chat"`
 - **Brand context:** Cached prefix using `buildBrandContext(brand)` — enables cache reuse across turns in same conversation
 - **System instructions:** "You are a helpful marketing advisor for [brand name]. Help the user brainstorm content ideas, develop marketing strategies, and answer questions about their business."
-- **User input:** The user's message
+- **User input:** Full conversation history (all previous user + assistant messages) formatted as a thread, followed by the latest user message. This ensures the AI has context of the entire conversation.
 - **Output schema:** `{ response: string }` — plain text reply, no structured JSON
 - **Max tokens:** 2048
 - **Credits spent:** 1 per user turn (not per AI turn)
@@ -209,7 +209,7 @@ export const ChatResponseSchema = z.object({
 
 **Notes:**
 - Schema is minimal: just a text response field
-- Instructions are stateless (no conversation history passed to the prompt) — context comes from the full message thread being sent to the API
+- Full conversation history is passed to the AI so it understands the context of previous messages
 - Brand name is interpolated into instructions at generation time
 
 ---
