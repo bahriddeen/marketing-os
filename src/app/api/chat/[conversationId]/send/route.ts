@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getOrCreateWorkspace, getCreditBalance } from "@/lib/workspace";
-import { runStructuredGeneration } from "@/lib/ai/engine";
+import { runStreamingChatGeneration, persistGenerationAndDebit } from "@/lib/ai/engine";
 import { chatInstructions, ChatResponseSchema } from "@/lib/ai/modules/chat";
+import { CREDIT_WEIGHTS } from "@/lib/ai/credits";
 import { buildBrandContext } from "@/lib/ai/prompts";
+import { formatSSEFrame, type ChatStreamEvent } from "@/lib/chatStream";
 import type { Brand } from "@/lib/types";
 
 export async function POST(
@@ -60,7 +62,7 @@ export async function POST(
 
   // Check credit balance
   const balance = await getCreditBalance(ws.id);
-  if (balance < 1) {
+  if (balance < CREDIT_WEIGHTS.chat) {
     return NextResponse.json({ ok: false, error: "Kreditlar yetarli emas. Tarifni yangilang." }, { status: 402 });
   }
 
@@ -71,7 +73,6 @@ export async function POST(
     .eq("conversation_id", conversationId)
     .order("created_at", { ascending: true });
 
-  // Format conversation history for AI
   const historyText = (messages ?? [])
     .map((msg) => `${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`)
     .join("\n");
@@ -79,8 +80,7 @@ export async function POST(
   const userInput = historyText ? `${historyText}\nUser: ${message}` : `User: ${message}`;
 
   // Persist the user's message before spending any credit, so a failed
-  // generation never loses it (matches the documented error-handling table:
-  // "AI call fails -> user message kept, no credit spent").
+  // generation never loses it.
   const { error: userMsgError } = await supabase
     .from("chat_messages")
     .insert({
@@ -93,43 +93,73 @@ export async function POST(
     return NextResponse.json({ ok: false, error: "Xabar saqlashda xato." }, { status: 500 });
   }
 
-  // Generate response
-  const result = await runStructuredGeneration({
-    workspaceId: ws.id,
-    userId: user.id,
-    brandId: brand.id,
-    module: "chat",
-    brandContext: buildBrandContext(brand as Brand),
-    moduleInstructions: chatInstructions(brand.name),
-    userInput,
-    inputRecord: { conversationId, message },
-    schema: ChatResponseSchema,
-    maxTokens: 2048,
+  const brandContext = buildBrandContext(brand as Brand);
+  const moduleInstructions = chatInstructions(brand.name);
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const encoder = new TextEncoder();
+      const send = (event: ChatStreamEvent) => {
+        controller.enqueue(encoder.encode(formatSSEFrame(event)));
+      };
+
+      try {
+        const gen = runStreamingChatGeneration({ brandContext, moduleInstructions, userInput });
+
+        let next = await gen.next();
+        while (!next.done) {
+          send({ type: "delta", text: next.value });
+          next = await gen.next();
+        }
+        const { fullText, usage } = next.value;
+
+        const parsed = ChatResponseSchema.safeParse({ response: fullText });
+        if (!parsed.success) {
+          throw new Error("invalid_output");
+        }
+
+        // Insert assistant response. Credit is already about to be spent —
+        // surface the reply to the user even if this insert fails, rather
+        // than discarding a paid-for response (same tradeoff as the
+        // non-streaming path).
+        const { error: assistantMsgError } = await supabase
+          .from("chat_messages")
+          .insert({
+            conversation_id: conversationId,
+            role: "assistant",
+            content: fullText,
+          });
+
+        if (assistantMsgError) {
+          console.error("failed to persist assistant message", assistantMsgError);
+        }
+
+        await persistGenerationAndDebit({
+          supabase,
+          workspaceId: ws.id,
+          brandId: brand.id,
+          userId: user.id,
+          module: "chat",
+          inputRecord: { conversationId, message },
+          output: { response: fullText },
+          usage,
+        });
+
+        send({ type: "done", creditsLeft: balance - CREDIT_WEIGHTS.chat });
+      } catch (e) {
+        console.error("chat stream failed", e);
+        send({ type: "error", error: "Generatsiya xatosi. Qayta urinib ko‘ring." });
+      } finally {
+        controller.close();
+      }
+    },
   });
 
-  if (!result.ok) {
-    return NextResponse.json(result, { status: 500 });
-  }
-
-  // Insert assistant response
-  const { error: assistantMsgError } = await supabase
-    .from("chat_messages")
-    .insert({
-      conversation_id: conversationId,
-      role: "assistant",
-      content: result.data.response,
-    });
-
-  if (assistantMsgError) {
-    // Credit is already spent and the reply was generated — surface it to
-    // the user rather than discarding a paid-for response. It just won't
-    // be part of the persisted thread until they retry.
-    console.error("failed to persist assistant message", assistantMsgError);
-  }
-
-  return NextResponse.json({
-    ok: true,
-    response: result.data.response,
-    creditsLeft: result.creditsLeft,
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
   });
 }
