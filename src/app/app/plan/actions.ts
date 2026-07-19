@@ -95,25 +95,32 @@ export async function bulkShiftDates(
     return { ok: false, error: "Postlarni yuklashda muammo." };
   }
 
-  // Shift dates in memory
-  const updates = posts.map((post) => ({
-    id: post.id,
-    date: addDays(post.date, parsed.data.days),
-    updated_at: new Date().toISOString(),
-  }));
+  // Shift dates individually — upsert() would fail here since it validates
+  // NOT NULL columns (plan_id, workspace_id, brand_id, topic, format,
+  // position) before evaluating onConflict, even though these are existing
+  // rows and only date/updated_at are changing.
+  const results = await Promise.all(
+    posts.map((post) =>
+      supabase
+        .from("plan_posts")
+        .update({
+          date: addDays(post.date, parsed.data.days),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", post.id)
+        .select("id")
+    )
+  );
 
-  // Upsert all posts with new dates
-  const { error: updateError, data } = await supabase
-    .from("plan_posts")
-    .upsert(updates, { onConflict: "id" })
-    .select("id");
-
+  const updateError = results.find((r) => r.error)?.error;
   if (updateError) {
     return { ok: false, error: "Saqlab bo‘lmadi. Qayta urinib ko‘ring." };
   }
 
+  const updatedCount = results.reduce((sum, r) => sum + (r.data?.length ?? 0), 0);
+
   revalidatePath("/app/plan");
-  return { ok: true, updated: (data ?? []).length };
+  return { ok: true, updated: updatedCount };
 }
 
 export async function deletePlan(
