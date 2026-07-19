@@ -67,7 +67,7 @@ export default function NewConversationPage() {
     return (
       <div className="rounded-lg border border-line bg-canvas-soft p-8 text-center">
         <p className="text-muted mb-4">Suhbat yaratishdan oldin brend yaratishingiz kerak</p>
-        <Link href="/app/brands/new" className="inline-block rounded bg-accent px-4 py-2 text-white">
+        <Link href="/app/brands/new" className="inline-block rounded bg-accent px-4 py-2 text-ink">
           Yangi brend
         </Link>
       </div>
@@ -100,7 +100,7 @@ export default function NewConversationPage() {
           <button
             type="submit"
             disabled={creating || !selectedBrandId}
-            className="flex-1 rounded bg-accent px-4 py-2 text-white font-semibold disabled:opacity-50"
+            className="flex-1 rounded bg-accent px-4 py-2 text-ink font-semibold disabled:opacity-50"
           >
             {creating ? "Yaratilnyapti..." : "Suhbatni boshlash"}
           </button>
