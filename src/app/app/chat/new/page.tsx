@@ -13,13 +13,25 @@ interface Brand {
 export default function NewConversationPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [selectedBrandId, setSelectedBrandId] = useState("");
+  const [workspaceId, setWorkspaceId] = useState("");
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const router = useRouter();
   const supabase = createBrowserClient();
 
   useEffect(() => {
-    async function loadBrands() {
+    async function loadData() {
+      // Load workspace_id
+      const { data: wsData } = await supabase
+        .from("workspace_members")
+        .select("workspace_id")
+        .single();
+
+      if (wsData?.workspace_id) {
+        setWorkspaceId(wsData.workspace_id);
+      }
+
+      // Load brands
       const { data, error } = await supabase
         .from("brands")
         .select("id, name")
@@ -34,18 +46,19 @@ export default function NewConversationPage() {
       setLoading(false);
     }
 
-    loadBrands();
+    loadData();
   }, [supabase]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedBrandId) return;
+    if (!selectedBrandId || !workspaceId) return;
 
     setCreating(true);
     const { data, error } = await supabase
       .from("chat_conversations")
       .insert({
         brand_id: selectedBrandId,
+        workspace_id: workspaceId,
         title: null,
       })
       .select("id")
