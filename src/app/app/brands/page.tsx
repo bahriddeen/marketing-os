@@ -30,7 +30,7 @@ export default async function BrandsPage() {
         <Card className="text-center">
           <p className="text-muted">
             Hali brendingiz yo‘q. Birinchi brendni qo‘shing — Sun‘iy intellekt shu
-            ma&apos;lumotlar asosida barcha kontentni tayyorlaydi.
+            ma‘lumotlar asosida barcha kontentni tayyorlaydi.
           </p>
           <Link href="/app/brands/new" className="mt-4 inline-block">
             <Button>Birinchi brendni qo‘shish</Button>
