@@ -7,15 +7,11 @@ import Button from '@/components/ui/Button';
 interface CalendarHeaderProps {
   currentDate: Date;
   onDateChange: (date: Date) => void;
-  viewMode: 'month' | 'week';
-  onViewChange: (mode: 'month' | 'week') => void;
 }
 
 export default function CalendarHeader({
   currentDate,
   onDateChange,
-  viewMode,
-  onViewChange,
 }: CalendarHeaderProps) {
   const monthYear = format(currentDate, "MMMM yyyy", { locale: uz });
 
@@ -46,29 +42,6 @@ export default function CalendarHeader({
         >
           Bugun
         </Button>
-      </div>
-
-      <div className="flex gap-1 rounded border border-line p-1">
-        <button
-          onClick={() => onViewChange('month')}
-          className={`px-3 py-1 rounded text-sm font-medium transition ${
-            viewMode === 'month'
-              ? 'bg-accent text-white'
-              : 'text-muted hover:text-ink'
-          }`}
-        >
-          Oy
-        </button>
-        <button
-          onClick={() => onViewChange('week')}
-          className={`px-3 py-1 rounded text-sm font-medium transition ${
-            viewMode === 'week'
-              ? 'bg-accent text-white'
-              : 'text-muted hover:text-ink'
-          }`}
-        >
-          Hafta
-        </button>
       </div>
     </div>
   );

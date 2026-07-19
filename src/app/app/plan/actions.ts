@@ -72,13 +72,15 @@ export async function bulkUpdateStatus(
 const BulkShiftDatesSchema = z.object({
   ids: z.array(z.string().uuid()).min(1).max(100),
   days: z.number().int(),
+  planId: z.string().uuid(),
 });
 
 export async function bulkShiftDates(
   ids: string[],
-  days: number
+  days: number,
+  planId: string
 ): Promise<{ ok: true; updated: number } | { ok: false; error: string }> {
-  const parsed = BulkShiftDatesSchema.safeParse({ ids, days });
+  const parsed = BulkShiftDatesSchema.safeParse({ ids, days, planId });
   if (!parsed.success) {
     return { ok: false, error: "Noto‘g‘ri so‘rov." };
   }
@@ -89,7 +91,8 @@ export async function bulkShiftDates(
   const { data: posts, error: fetchError } = await supabase
     .from("plan_posts")
     .select("id, date")
-    .in("id", parsed.data.ids);
+    .in("id", parsed.data.ids)
+    .eq("plan_id", planId);
 
   if (fetchError || !posts) {
     return { ok: false, error: "Postlarni yuklashda muammo." };
@@ -99,27 +102,45 @@ export async function bulkShiftDates(
   // NOT NULL columns (plan_id, workspace_id, brand_id, topic, format,
   // position) before evaluating onConflict, even though these are existing
   // rows and only date/updated_at are changing.
+  const updates = posts.map((post) => ({
+    id: post.id,
+    originalDate: post.date,
+    newDate: addDays(post.date, parsed.data.days),
+  }));
+
   const results = await Promise.all(
-    posts.map((post) =>
+    updates.map((u) =>
       supabase
         .from("plan_posts")
-        .update({
-          date: addDays(post.date, parsed.data.days),
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", post.id)
+        .update({ date: u.newDate, updated_at: new Date().toISOString() })
+        .eq("id", u.id)
         .select("id")
     )
   );
 
-  const updateError = results.find((r) => r.error)?.error;
-  if (updateError) {
+  const failedIndices = results
+    .map((r, i) => (r.error ? i : -1))
+    .filter((i) => i >= 0);
+
+  if (failedIndices.length > 0) {
+    // Roll back every update that succeeded, so a retry starts from a clean
+    // original state instead of double-shifting already-moved posts.
+    const succeededUpdates = updates.filter((_, i) => !failedIndices.includes(i));
+    await Promise.all(
+      succeededUpdates.map((u) =>
+        supabase
+          .from("plan_posts")
+          .update({ date: u.originalDate, updated_at: new Date().toISOString() })
+          .eq("id", u.id)
+      )
+    );
     return { ok: false, error: "Saqlab bo‘lmadi. Qayta urinib ko‘ring." };
   }
 
   const updatedCount = results.reduce((sum, r) => sum + (r.data?.length ?? 0), 0);
 
   revalidatePath("/app/plan");
+  revalidatePath(`/app/plan/${planId}`, "layout");
   return { ok: true, updated: updatedCount };
 }
 

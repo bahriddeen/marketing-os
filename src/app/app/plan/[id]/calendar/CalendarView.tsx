@@ -18,7 +18,6 @@ interface CalendarViewProps {
 
 export default function CalendarView({ initialPosts, planId }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
   const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -55,7 +54,7 @@ export default function CalendarView({ initialPosts, planId }: CalendarViewProps
         return;
       }
 
-      const result = await bulkShiftDates(Array.from(selectedPostIds), days);
+      const result = await bulkShiftDates(Array.from(selectedPostIds), days, planId);
       if (!result.ok) {
         setError(result.error);
         return;
@@ -65,7 +64,7 @@ export default function CalendarView({ initialPosts, planId }: CalendarViewProps
       setError(null);
       router.refresh();
     },
-    [selectedPostIds, initialPosts, router]
+    [selectedPostIds, initialPosts, router, planId]
   );
 
   const handleChangeStatus = useCallback(
@@ -108,8 +107,6 @@ export default function CalendarView({ initialPosts, planId }: CalendarViewProps
       <CalendarHeader
         currentDate={currentDate}
         onDateChange={setCurrentDate}
-        viewMode={viewMode}
-        onViewChange={setViewMode}
       />
 
       <div className="border border-line rounded">

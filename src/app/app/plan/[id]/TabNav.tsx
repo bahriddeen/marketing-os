@@ -27,7 +27,7 @@ export default function TabNav({ planId }: { planId: string }) {
             : 'border-transparent text-muted hover:text-ink'
         }`}
       >
-        Tarqalib
+        Taqvim
       </Link>
     </div>
   );
