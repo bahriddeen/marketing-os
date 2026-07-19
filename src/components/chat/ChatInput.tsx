@@ -1,19 +1,26 @@
 "use client";
 
 import { useState } from "react";
+import { parseSSEFrames } from "@/lib/chatStream";
 
 interface ChatInputProps {
   conversationId: string;
   creditsLeft: number;
   isReadOnly?: boolean;
-  onMessageSent: (userMessage: string, response: string, creditsLeft: number) => void;
+  onStreamStart: (userMessage: string) => void;
+  onDelta: (text: string) => void;
+  onDone: (creditsLeft: number) => void;
+  onStreamError: (error: string) => void;
 }
 
 export function ChatInput({
   conversationId,
   creditsLeft,
   isReadOnly = false,
-  onMessageSent,
+  onStreamStart,
+  onDelta,
+  onDone,
+  onStreamError,
 }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,26 +34,60 @@ export function ChatInput({
       return;
     }
 
+    const sentMessage = message;
     setLoading(true);
     setError(null);
+    setMessage("");
+    onStreamStart(sentMessage);
 
     try {
       const response = await fetch(`/api/chat/${conversationId}/send`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message: sentMessage }),
       });
 
-      const result = await response.json();
+      if (!response.ok) {
+        const result = await response.json().catch(() => null);
+        const msg = result?.error || "Xato yuz berdi";
+        setError(msg);
+        onStreamError(msg);
+        return;
+      }
 
-      if (result.ok) {
-        onMessageSent(message, result.response, result.creditsLeft);
-        setMessage("");
-      } else {
-        setError(result.error || "Xato yuz berdi");
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error("no_stream");
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done: readerDone, value } = await reader.read();
+        if (readerDone) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const { events, remainder } = parseSSEFrames(buffer);
+        buffer = remainder;
+
+        let terminal = false;
+        for (const evt of events) {
+          if (evt.type === "delta") {
+            onDelta(evt.text);
+          } else if (evt.type === "done") {
+            onDone(evt.creditsLeft);
+            terminal = true;
+          } else if (evt.type === "error") {
+            setError(evt.error);
+            onStreamError(evt.error);
+            terminal = true;
+          }
+        }
+        if (terminal) break;
       }
     } catch {
-      setError("Ulanish xatosi. Qayta urinib ko’ring.");
+      const msg = "Ulanish xatosi. Qayta urinib ko‘ring.";
+      setError(msg);
+      onStreamError(msg);
     } finally {
       setLoading(false);
     }

@@ -12,6 +12,54 @@ export type GenerationResult<T> =
   | { ok: true; data: T; creditsLeft: number; generationId: string | null }
   | { ok: false; error: string };
 
+type Usage = {
+  input_tokens: number;
+  output_tokens: number;
+  cache_read_input_tokens?: number | null;
+};
+
+export async function persistGenerationAndDebit(opts: {
+  supabase: Awaited<ReturnType<typeof createClient>>;
+  workspaceId: string;
+  brandId: string | null;
+  userId: string;
+  module: ModuleId;
+  inputRecord: Record<string, unknown>;
+  output: object;
+  usage: Usage;
+}): Promise<{ generationId: string | null }> {
+  const weight = CREDIT_WEIGHTS[opts.module];
+
+  const { data: gen } = await opts.supabase
+    .from("generations")
+    .insert({
+      workspace_id: opts.workspaceId,
+      brand_id: opts.brandId,
+      user_id: opts.userId,
+      module: opts.module,
+      input: opts.inputRecord,
+      output: opts.output,
+      model: MODEL,
+      input_tokens: opts.usage.input_tokens,
+      output_tokens: opts.usage.output_tokens,
+      cache_read_tokens: opts.usage.cache_read_input_tokens ?? 0,
+      credits_spent: weight,
+    })
+    .select("id")
+    .single();
+
+  if (weight > 0) {
+    await opts.supabase.from("credit_ledger").insert({
+      workspace_id: opts.workspaceId,
+      delta: -weight,
+      reason: "generation",
+      generation_id: gen?.id ?? null,
+    });
+  }
+
+  return { generationId: gen?.id ?? null };
+}
+
 export async function runStructuredGeneration<T>(opts: {
   workspaceId: string;
   userId: string;
@@ -63,32 +111,52 @@ export async function runStructuredGeneration<T>(opts: {
     return { ok: false, error: "Natijani o‘qib bo‘lmadi. Qayta urinib ko‘ring." };
   }
 
-  const { data: gen } = await supabase
-    .from("generations")
-    .insert({
-      workspace_id: opts.workspaceId,
-      brand_id: opts.brandId,
-      user_id: opts.userId,
-      module: opts.module,
-      input: opts.inputRecord,
-      output: data as object,
-      model: MODEL,
-      input_tokens: response.usage.input_tokens,
-      output_tokens: response.usage.output_tokens,
-      cache_read_tokens: response.usage.cache_read_input_tokens ?? 0,
-      credits_spent: weight,
-    })
-    .select("id")
-    .single();
+  const { generationId } = await persistGenerationAndDebit({
+    supabase,
+    workspaceId: opts.workspaceId,
+    brandId: opts.brandId,
+    userId: opts.userId,
+    module: opts.module,
+    inputRecord: opts.inputRecord,
+    output: data as object,
+    usage: response.usage,
+  });
 
-  if (weight > 0) {
-    await supabase.from("credit_ledger").insert({
-      workspace_id: opts.workspaceId,
-      delta: -weight,
-      reason: "generation",
-      generation_id: gen?.id ?? null,
-    });
+  return { ok: true, data, creditsLeft: balance - weight, generationId };
+}
+
+export async function* runStreamingChatGeneration(opts: {
+  brandContext: string;
+  moduleInstructions: string;
+  userInput: string;
+  maxTokens?: number;
+}): AsyncGenerator<string, { fullText: string; usage: Usage }, void> {
+  const stream = client.messages.stream({
+    model: MODEL,
+    max_tokens: opts.maxTokens ?? 2048,
+    thinking: { type: "adaptive" },
+    system: [
+      { type: "text", text: SYSTEM_BASE, cache_control: { type: "ephemeral" } },
+      {
+        type: "text",
+        text: opts.brandContext + "\n\n" + opts.moduleInstructions,
+        cache_control: { type: "ephemeral" },
+      },
+    ],
+    messages: [{ role: "user", content: opts.userInput }],
+  });
+
+  for await (const event of stream) {
+    if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+      yield event.delta.text;
+    }
   }
 
-  return { ok: true, data, creditsLeft: balance - weight, generationId: gen?.id ?? null };
+  const finalMessage = await stream.finalMessage();
+  let fullText = "";
+  for (const block of finalMessage.content) {
+    if (block.type === "text") fullText += block.text;
+  }
+
+  return { fullText, usage: finalMessage.usage };
 }

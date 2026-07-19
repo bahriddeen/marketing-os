@@ -19,6 +19,11 @@ describe("chatInstructions", () => {
     const brand = "TestBrand";
     expect(chatInstructions(brand)).toBe(chatInstructions(brand));
   });
+
+  it("mentions Markdown formatting", () => {
+    const instructions = chatInstructions("TestBrand");
+    expect(instructions).toContain("Markdown");
+  });
 });
 
 describe("ChatResponseSchema", () => {

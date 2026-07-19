@@ -209,9 +209,9 @@ Whether a stream that errors mid-way should discard the partial text shown to th
 
 ## Success Criteria
 
-- [ ] Sending a message shows the reply growing token-by-token, not a static loading pulse.
-- [ ] Assistant replies render Markdown (bold, lists, headings, links) correctly.
-- [ ] A credit is spent if and only if a reply fully completes.
-- [ ] A dropped/failed stream shows an error and spends no credit.
-- [ ] The 3-retry polling reconciliation code is removed, replaced by the `done`-triggered single fetch.
-- [ ] No other generation module's code path changes.
+- [x] Sending a message shows the reply growing token-by-token, not a static loading pulse. (Verified live: EVOS brand, "3 ta kontent g'oyasi bering" — text visibly grew in bursts rather than appearing all at once.)
+- [x] Assistant replies render Markdown (bold, lists, headings, links) correctly. (Verified live: numbered list items, bold phrases, and a bulleted list with bold labels all rendered as real HTML elements, not literal `**`/`-` characters.)
+- [x] A credit is spent if and only if a reply fully completes. (Verified live: balance went 5→4 after one completed reply, confirmed via reload; a killed-mid-stream request left the balance at 4, unchanged.)
+- [x] A dropped/failed stream shows an error and spends no credit. (Verified live: killed the dev server mid-stream — client showed "Ulanish xatosi. Qayta urinib ko'ring.", credit balance unchanged, user's message stayed visible, the broken assistant placeholder was cleanly removed.)
+- [x] The 3-retry polling reconciliation code is removed, replaced by the `done`-triggered single fetch. (Verified in code review during implementation — Task 7 review confirmed `retryLoad` fully deleted.)
+- [x] No other generation module's code path changes. (Verified in code review — Task 3 review confirmed `runStructuredGeneration`'s signature/behavior unchanged and checked all five external callers.)
