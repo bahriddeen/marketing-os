@@ -39,6 +39,7 @@ export default function ConversationPage() {
   const [creditsLeft, setCreditsLeft] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isReadOnly, setIsReadOnly] = useState(false);
+  const [isLoadingResponse, setIsLoadingResponse] = useState(false);
 
   useEffect(() => {
     const loadConversation = async () => {
@@ -96,31 +97,58 @@ export default function ConversationPage() {
     loadConversation();
   }, [conversationId, supabase, router]);
 
-  const handleMessageSent = (response: string, newCreditsLeft: number) => {
-    // Add the user message (we show it optimistically, but verify with fresh load)
-    // Add the assistant response
+  const handleMessageSent = (userMessage: string, response: string, newCreditsLeft: number) => {
+    const now = new Date().toISOString();
+    const userMessageId = `tmp-user-${Date.now()}`;
+    const assistantMessageId = `tmp-assistant-${Date.now()}`;
+
+    // Add optimistic messages with actual user message content
     setMessages((prev) => [
       ...prev,
-      { id: "tmp-user", role: "user", content: "", created_at: new Date().toISOString() },
+      { id: userMessageId, role: "user", content: userMessage, created_at: now },
       {
-        id: "tmp-assistant",
+        id: assistantMessageId,
         role: "assistant",
         content: response,
-        created_at: new Date().toISOString(),
+        created_at: now,
       },
     ]);
     setCreditsLeft(newCreditsLeft);
+    setIsLoadingResponse(true);
 
-    // Reload messages to sync with server state
-    setTimeout(async () => {
+    // Retry logic to reload messages with exponential backoff
+    const retryLoad = async (attempt = 0) => {
+      const delays = [300, 600, 1200];
+      if (attempt > 0) {
+        await new Promise((resolve) => setTimeout(resolve, delays[attempt - 1]));
+      }
+
       const { data: msgs } = await supabase
         .from("chat_messages")
         .select("id, role, content, created_at")
         .eq("conversation_id", conversationId)
         .order("created_at", { ascending: true });
 
-      setMessages(msgs || []);
-    }, 500);
+      if (msgs && msgs.length > 0) {
+        // Check if we have the messages we just sent
+        const hasUserMsg = msgs.some((m) => m.role === "user" && m.content === userMessage);
+        if (hasUserMsg) {
+          setMessages(msgs);
+          setIsLoadingResponse(false);
+          return;
+        }
+      }
+
+      // Retry if we haven't found the messages yet and haven't exceeded max retries
+      if (attempt < 2) {
+        retryLoad(attempt + 1);
+      } else {
+        // Give up after 3 attempts, use optimistic messages
+        setIsLoadingResponse(false);
+      }
+    };
+
+    retryLoad();
   };
 
   const handleDelete = async () => {
@@ -167,8 +195,7 @@ export default function ConversationPage() {
       {/* Messages */}
       <MessageThread
         messages={messages}
-        conversationTitle={conversation.title || "Suhbat"}
-        brandName={conversation.brand_name}
+        isLoading={isLoadingResponse}
       />
 
       {/* Input */}

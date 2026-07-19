@@ -6,7 +6,7 @@ interface ChatInputProps {
   conversationId: string;
   creditsLeft: number;
   isReadOnly?: boolean;
-  onMessageSent: (response: string, creditsLeft: number) => void;
+  onMessageSent: (userMessage: string, response: string, creditsLeft: number) => void;
 }
 
 export function ChatInput({
@@ -40,13 +40,13 @@ export function ChatInput({
       const result = await response.json();
 
       if (result.ok) {
-        onMessageSent(result.response, result.creditsLeft);
+        onMessageSent(message, result.response, result.creditsLeft);
         setMessage("");
       } else {
         setError(result.error || "Xato yuz berdi");
       }
-    } catch (err) {
-      setError("Ulanish xatosi. Qayta urinib ko‘ring.");
+    } catch {
+      setError("Ulanish xatosi. Qayta urinib ko’ring.");
     } finally {
       setLoading(false);
     }

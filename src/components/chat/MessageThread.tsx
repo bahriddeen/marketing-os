@@ -11,21 +11,20 @@ interface Message {
 
 interface MessageThreadProps {
   messages: Message[];
-  conversationTitle: string;
-  brandName: string;
+  isLoading?: boolean;
 }
 
-export function MessageThread({ messages, conversationTitle, brandName }: MessageThreadProps) {
+export function MessageThread({ messages, isLoading = false }: MessageThreadProps) {
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isLoading]);
 
   return (
     <div className="flex-1 overflow-y-auto space-y-4 pb-4">
       {messages.length === 0 ? (
-        <div className="text-center py-8 text-muted">Suhbatni boshlang...</div>
+        <div className="text-center py-8 text-muted">{"Bu suhbatda hali xabar yo'q. Quyida birinchi xabaringizni yozing."}</div>
       ) : (
         messages.map((msg) => (
           <div
@@ -49,6 +48,13 @@ export function MessageThread({ messages, conversationTitle, brandName }: Messag
             </div>
           </div>
         ))
+      )}
+      {isLoading && (
+        <div className="flex justify-start">
+          <div className="max-w-xs rounded-lg px-4 py-2 bg-canvas-soft text-muted border border-line animate-pulse">
+            <p className="text-sm">Javob yozilmoqda...</p>
+          </div>
+        </div>
       )}
       <div ref={endRef} />
     </div>

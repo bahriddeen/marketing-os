@@ -15,7 +15,14 @@
       "Bash(git -C /Users/bahriddin/marketingOs log -5 --format='%h %ae %ce %s')",
       "Bash(xargs -I{} basename {})",
       "Bash(git commit *)",
-      "Skill(claude-api)"
+      "Skill(claude-api)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(python3 *)",
+      "Bash(npx tsc *)",
+      "Bash(pkill -f \"npm run dev\")",
+      "Read(//tmp/**)",
+      "Bash(git checkout *)"
     ]
   }
 }
