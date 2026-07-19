@@ -1,6 +1,6 @@
 import { signUp } from "@/app/auth/actions";
 import { Input, Label } from "@/components/ui/Input";
-import Button from "@/components/ui/Button";
+import SubmitButton from "@/components/auth/SubmitButton";
 import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
 import Link from "next/link";
 
@@ -40,9 +40,9 @@ export default async function SignupPage({
             placeholder="Kamida 8 belgi"
           />
         </label>
-        <Button type="submit" className="w-full">
+        <SubmitButton pendingText="Ro‘yxatdan o‘tilyapti...">
           Ro&apos;yxatdan o&apos;tish
-        </Button>
+        </SubmitButton>
         <p className="text-center text-sm text-muted">
           Akkauntingiz bormi?{" "}
           <Link className="font-medium text-accent hover:underline" href="/login">

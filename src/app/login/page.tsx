@@ -1,6 +1,6 @@
 import { signIn } from "@/app/auth/actions";
 import { Input, Label } from "@/components/ui/Input";
-import Button from "@/components/ui/Button";
+import SubmitButton from "@/components/auth/SubmitButton";
 import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
 import Link from "next/link";
 
@@ -34,9 +34,7 @@ export default async function LoginPage({
           <Label>Parol</Label>
           <Input name="password" type="password" required placeholder="••••••••" />
         </label>
-        <Button type="submit" className="w-full">
-          Kirish
-        </Button>
+        <SubmitButton pendingText="Kirilyapti...">Kirish</SubmitButton>
         <p className="text-center text-sm text-muted">
           Akkauntingiz yo&apos;qmi?{" "}
           <Link className="font-medium text-accent hover:underline" href="/signup">
