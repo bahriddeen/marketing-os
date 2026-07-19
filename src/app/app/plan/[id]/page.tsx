@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
-import PlanTable from "../PlanTable";
+import PlanTable from "./PlanTable";
 import type { ContentPlan, PlanPostRow } from "@/lib/types";
 
 export default async function PlanDetailPage({

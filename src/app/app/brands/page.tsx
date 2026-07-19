@@ -1,12 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { getOrCreateWorkspace } from "@/lib/workspace";
+import { deleteBrand } from "./actions";
 import type { Brand } from "@/lib/types";
 import Link from "next/link";
-import { Briefcase } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import EmptyState from "@/components/ui/EmptyState";
-import BrandDeleteButton from "./BrandDeleteButton";
 
 export default async function BrandsPage() {
   const ws = await getOrCreateWorkspace();
@@ -29,16 +27,15 @@ export default async function BrandsPage() {
         </Link>
       </div>
       {brands.length === 0 && (
-        <EmptyState
-          icon={Briefcase}
-          title="Hali brendingiz yo‘q."
-          description="Birinchi brendni qo‘shing — Sun‘iy intellekt shu ma‘lumotlar asosida barcha kontentni tayyorlaydi."
-          action={
-            <Link href="/app/brands/new">
-              <Button>Birinchi brendni qo‘shish</Button>
-            </Link>
-          }
-        />
+        <Card className="text-center">
+          <p className="text-muted">
+            Hali brendingiz yo‘q. Birinchi brendni qo‘shing — Sun‘iy intellekt shu
+            ma&apos;lumotlar asosida barcha kontentni tayyorlaydi.
+          </p>
+          <Link href="/app/brands/new" className="mt-4 inline-block">
+            <Button>Birinchi brendni qo‘shish</Button>
+          </Link>
+        </Card>
       )}
       <div className="grid gap-4 sm:grid-cols-2">
         {brands.map((b) => (
@@ -52,7 +49,12 @@ export default async function BrandsPage() {
               >
                 Tahrirlash
               </Link>
-              <BrandDeleteButton id={b.id} name={b.name} />
+              <form action={deleteBrand}>
+                <input type="hidden" name="id" value={b.id} />
+                <button className="font-medium text-danger hover:underline">
+                  O‘chirish
+                </button>
+              </form>
             </div>
           </Card>
         ))}

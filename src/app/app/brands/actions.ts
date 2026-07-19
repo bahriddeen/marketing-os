@@ -35,22 +35,9 @@ export async function saveBrand(formData: FormData) {
   redirect("/app/brands");
 }
 
-export async function deleteBrand(
-  brandId: string
-): Promise<{ ok: true } | { ok: false; error: string }> {
+export async function deleteBrand(formData: FormData) {
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("brands")
-    .delete()
-    .eq("id", brandId)
-    .select("id")
-    .maybeSingle();
-  if (error) {
-    return { ok: false, error: "O‘chirib bo‘lmadi. Qayta urinib ko‘ring." };
-  }
-  if (!data) {
-    return { ok: false, error: "Brend topilmadi." };
-  }
+  await supabase.from("brands").delete().eq("id", String(formData.get("id")));
   revalidatePath("/app/brands");
-  return { ok: true };
+  redirect("/app/brands");
 }

@@ -12,8 +12,6 @@ import {
 import { deletePlan } from "./actions";
 import Button from "@/components/ui/Button";
 import { Select } from "@/components/ui/Input";
-import ConfirmDialog from "@/components/ui/ConfirmDialog";
-import { useToast } from "@/components/ui/Toast";
 
 export type PlanRow = {
   id: string;
@@ -33,33 +31,29 @@ export default function PlansTable({
   total: number;
 }) {
   const router = useRouter();
-  const toast = useToast();
-  const [confirmTarget, setConfirmTarget] = useState<{
-    id: string;
-    title: string;
-  } | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   const from = (params.page - 1) * params.size;
   const last = Math.max(1, Math.ceil(total / params.size));
 
-  function onDelete() {
-    if (!confirmTarget) return;
-    const id = confirmTarget.id;
+  function onDelete(id: string) {
     startTransition(async () => {
       const res = await deletePlan(id);
       if (res.ok) {
-        setConfirmTarget(null);
-        toast.show("Plan o‘chirildi.", "success");
+        setConfirmId(null);
+        setError(null);
         router.refresh();
       } else {
-        toast.show(res.error, "error");
+        setError(res.error);
       }
     });
   }
 
   return (
     <div className="space-y-3">
+      {error && <p className="text-sm text-danger">{error}</p>}
       <div className="overflow-x-auto rounded-[0.625rem] border border-line bg-surface">
         <table className="w-full min-w-[36rem] text-sm">
           <thead>
@@ -97,22 +91,47 @@ export default function PlansTable({
                   className="whitespace-nowrap px-4 py-3"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <span className="flex items-center gap-3">
-                    <Link
-                      href={`/app/plan/${p.id}`}
-                      aria-label="Tahrirlash"
-                      className="rounded text-muted transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-                    >
-                      <Pencil size={16} />
-                    </Link>
-                    <button
-                      onClick={() => setConfirmTarget({ id: p.id, title: p.title })}
-                      aria-label="O‘chirish"
-                      className="rounded text-muted transition-colors hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </span>
+                  {confirmId === p.id ? (
+                    <span className="flex items-center gap-2 text-sm">
+                      <span className="text-muted">O‘chirilsinmi?</span>
+                      <Button
+                        variant="danger"
+                        onClick={() => onDelete(p.id)}
+                        disabled={pending}
+                        className="px-1 py-0"
+                      >
+                        {pending ? "…" : "Ha"}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => setConfirmId(null)}
+                        disabled={pending}
+                        className="px-1 py-0"
+                      >
+                        Yo‘q
+                      </Button>
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-3">
+                      <Link
+                        href={`/app/plan/${p.id}`}
+                        aria-label="Tahrirlash"
+                        className="text-muted transition-colors hover:text-accent"
+                      >
+                        <Pencil size={16} />
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setConfirmId(p.id);
+                          setError(null);
+                        }}
+                        aria-label="O‘chirish"
+                        className="text-muted transition-colors hover:text-danger"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </span>
+                  )}
                 </td>
               </tr>
             ))}
@@ -152,7 +171,7 @@ export default function PlansTable({
               <Link
                 key={item}
                 href={`/app/plan${buildPlansQuery(params, { page: item })}`}
-                className="flex h-8 min-w-8 items-center justify-center rounded-[0.625rem] px-2 text-muted transition-colors hover:bg-canvas hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+                className="flex h-8 min-w-8 items-center justify-center rounded-[0.625rem] px-2 text-muted transition-colors hover:bg-canvas hover:text-ink"
               >
                 {item}
               </Link>
@@ -189,20 +208,6 @@ export default function PlansTable({
           </Select>
         </div>
       </div>
-      <ConfirmDialog
-        open={!!confirmTarget}
-        title="Planni o‘chirish"
-        description={
-          confirmTarget
-            ? `"${confirmTarget.title}" planini o‘chirmoqchimisiz? Bu amalni ortga qaytarib bo‘lmaydi.`
-            : ""
-        }
-        confirmLabel="Ha, o‘chirish"
-        cancelLabel="Bekor qilish"
-        onConfirm={onDelete}
-        onCancel={() => setConfirmTarget(null)}
-        pending={pending}
-      />
     </div>
   );
 }
