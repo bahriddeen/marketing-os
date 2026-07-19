@@ -12,7 +12,10 @@
       "Skill(claude-in-chrome)",
       "Bash(git -C /Users/bahriddin/marketingOs config user.email)",
       "Bash(git -C /Users/bahriddin/marketingOs config --global user.email)",
-      "Bash(git -C /Users/bahriddin/marketingOs log -5 --format='%h %ae %ce %s')"
+      "Bash(git -C /Users/bahriddin/marketingOs log -5 --format='%h %ae %ce %s')",
+      "Bash(xargs -I{} basename {})",
+      "Bash(git commit *)",
+      "Skill(claude-api)"
     ]
   }
 }

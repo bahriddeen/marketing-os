@@ -419,7 +419,7 @@ export default function AuthSplitLayout({
         </Link>
         <div className="max-w-sm">
           <p className="mb-6 font-display text-2xl font-semibold leading-snug text-white">
-            Brendingiz haqida yozing — qolganini AI bajaradi.
+            Brendingiz haqida yozing qolganini AI bajaradi.
           </p>
           <CaptionDemo variant="quiet" />
         </div>
@@ -1125,7 +1125,7 @@ export default function NewBrandClient() {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={4}
-          placeholder="Masalan: Vetline — Toshkentdagi veterinariya klinikasi. Uy hayvonlari uchun 24/7 xizmat..."
+          placeholder="Masalan: Sweet House - Toshkentdagi shirinlik do‘koni. Tortlar, pishiriqlar va desertlar tayyorlaymiz. Buyurtmalarni yetkazib berish xizmati mavjud..."
         />
         {error && <p className="text-sm text-danger">{error}</p>}
         <Button

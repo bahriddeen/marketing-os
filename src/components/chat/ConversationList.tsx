@@ -3,6 +3,14 @@ import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { uz } from "date-fns/locale";
 
+type ChatConversationRow = {
+  id: string;
+  title: string | null;
+  brand_id: string;
+  created_at: string;
+  brands: { name: string } | { name: string }[] | null;
+};
+
 interface Conversation {
   id: string;
   title: string | null;
@@ -20,19 +28,22 @@ export async function ConversationListComponent({ workspaceId }: { workspaceId: 
     .eq("workspace_id", workspaceId)
     .order("created_at", { ascending: false });
 
-  const conversationList = (conversations ?? []).map((c: any) => ({
-    id: c.id,
-    title: c.title,
-    brand_id: c.brand_id,
-    created_at: c.created_at,
-    brand_name: c.brands?.name || "Noma‘lum",
-  }));
+  const conversationList = (conversations ?? []).map((c: ChatConversationRow) => {
+    const brandName = Array.isArray(c.brands) ? c.brands[0]?.name : c.brands?.name;
+    return {
+      id: c.id,
+      title: c.title,
+      brand_id: c.brand_id,
+      created_at: c.created_at,
+      brand_name: brandName || "Noma’lum",
+    };
+  });
 
   if (conversationList.length === 0) {
     return (
       <div className="rounded-lg border border-line bg-canvas-soft p-8 text-center">
         <p className="text-muted mb-4">Suhbatlarni yarating va brainstorm qiling</p>
-        <Link href="/app/chat/new" className="inline-block rounded bg-accent px-4 py-2 text-white">
+        <Link href="/app/chat/new" className="inline-block rounded bg-accent px-4 py-2 text-ink">
           Yangi suhbat
         </Link>
       </div>

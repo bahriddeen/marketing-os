@@ -9,7 +9,7 @@ export default async function ChatPage() {
     <div>
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-ink">Suhbat</h1>
-        <Link href="/app/chat/new" className="rounded bg-accent px-4 py-2 text-white font-semibold">
+        <Link href="/app/chat/new" className="rounded bg-accent px-4 py-2 text-ink font-semibold">
           Yangi suhbat
         </Link>
       </div>

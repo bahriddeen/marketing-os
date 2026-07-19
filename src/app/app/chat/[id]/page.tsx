@@ -14,6 +14,13 @@ interface Message {
   created_at: string;
 }
 
+type ChatConversationRow = {
+  id: string;
+  title: string | null;
+  brand_id: string;
+  brands: { name: string } | { name: string }[] | null;
+};
+
 interface Conversation {
   id: string;
   title: string | null;
@@ -47,12 +54,13 @@ export default function ConversationPage() {
         return;
       }
 
-      const c = conv as any;
+      const c = conv as ChatConversationRow;
+      const brandName = Array.isArray(c.brands) ? c.brands[0]?.name : c.brands?.name;
       setConversation({
         id: c.id,
         title: c.title,
         brand_id: c.brand_id,
-        brand_name: c.brands?.name || "Noma‘lum",
+        brand_name: brandName || "Noma’lum",
       });
 
       // Check if brand still exists

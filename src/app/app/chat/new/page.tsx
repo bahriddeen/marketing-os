@@ -54,7 +54,7 @@ export default function NewConversationPage() {
     if (!error && data) {
       router.push(`/app/chat/${data.id}`);
     } else {
-      alert("Suhbat yaratishda xato: " + (error?.message || "Noma'lum xato"));
+      alert("Suhbat yaratishda xato: " + (error?.message || "Noma‘lum xato"));
       setCreating(false);
     }
   };
