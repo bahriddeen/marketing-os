@@ -103,7 +103,7 @@ export async function bulkShiftDates(
   }));
 
   // Upsert all posts with new dates
-  const { error: updateError, count } = await supabase
+  const { error: updateError, data } = await supabase
     .from("plan_posts")
     .upsert(updates, { onConflict: "id" })
     .select("id");
@@ -113,7 +113,7 @@ export async function bulkShiftDates(
   }
 
   revalidatePath("/app/plan");
-  return { ok: true, updated: (count ?? 0) };
+  return { ok: true, updated: (data ?? []).length };
 }
 
 export async function deletePlan(
