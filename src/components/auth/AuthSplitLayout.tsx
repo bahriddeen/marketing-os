@@ -9,7 +9,7 @@ export default function AuthSplitLayout({
 }) {
   return (
     <div className="flex min-h-screen">
-      <div className="hidden w-1/2 flex-col justify-between bg-[#14171B] p-12 md:flex">
+      <div className="hidden w-1/2 flex-col justify-between bg-ink p-12 md:flex">
         <Link
           href="/"
           className="font-display text-lg font-semibold text-white"

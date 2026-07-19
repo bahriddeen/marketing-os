@@ -1,8 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { getOrCreateWorkspace } from "@/lib/workspace";
 import Link from "next/link";
-import Card from "@/components/ui/Card";
+import { CalendarDays, Search } from "lucide-react";
 import Button from "@/components/ui/Button";
+import EmptyState from "@/components/ui/EmptyState";
 import PlansToolbar from "./PlansToolbar";
 import PlansTable, { type PlanRow } from "./PlansTable";
 import { parsePlansParams, buildPlansQuery } from "@/lib/plansTable";
@@ -57,25 +58,30 @@ export default async function PlansPage({
       </div>
 
       {total === 0 && !hasFilters ? (
-        <Card className="text-center">
-          <p className="text-muted">
-            Hali kontent-planingiz yo‘q. Brend tanlang — sun‘iy intellekt bir
-            oylik plan tuzib beradi.
-          </p>
-          <Link href="/app/plan/new" className="mt-4 inline-block">
-            <Button>Birinchi planni yaratish</Button>
-          </Link>
-        </Card>
+        <EmptyState
+          icon={CalendarDays}
+          title="Hali kontent-planingiz yo‘q."
+          description="Brend tanlang — sun‘iy intellekt bir oylik plan tuzib beradi."
+          action={
+            <Link href="/app/plan/new">
+              <Button>Birinchi planni yaratish</Button>
+            </Link>
+          }
+        />
       ) : (
         <>
           <PlansToolbar brands={brands} params={p} />
           {plans.length === 0 ? (
-            <Card className="text-center">
-              <p className="text-muted">Hech narsa topilmadi.</p>
-              <Link href="/app/plan" className="mt-4 inline-block">
-                <Button variant="ghost">Filtrlarni tozalash</Button>
-              </Link>
-            </Card>
+            <EmptyState
+              icon={Search}
+              title="Hech narsa topilmadi."
+              description="Qidiruv yoki filtrlarga mos plan topilmadi."
+              action={
+                <Link href="/app/plan">
+                  <Button variant="ghost">Filtrlarni tozalash</Button>
+                </Link>
+              }
+            />
           ) : (
             <PlansTable key={buildPlansQuery(p) || "default"} plans={plans} params={p} total={total} />
           )}
