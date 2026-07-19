@@ -1,7 +1,7 @@
 // src/app/app/plan/[id]/calendar/CalendarView.tsx
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getMonthDays, formatDateKey, detectDateConflicts } from '@/lib/calendar';
 import { bulkShiftDates, bulkUpdateStatus } from '@/app/app/plan/actions';
@@ -17,16 +17,11 @@ interface CalendarViewProps {
 }
 
 export default function CalendarView({ initialPosts, planId }: CalendarViewProps) {
-  const [posts, setPosts] = useState<PlanPostRow[]>(initialPosts);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
   const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
-  useEffect(() => {
-    setPosts(initialPosts);
-  }, [initialPosts]);
 
   const handleSelectPost = useCallback((postId: string, selected: boolean) => {
     setSelectedPostIds((prev) => {
@@ -41,18 +36,18 @@ export default function CalendarView({ initialPosts, planId }: CalendarViewProps
   }, []);
 
   const handleSelectAll = useCallback(() => {
-    if (selectedPostIds.size === posts.length) {
+    if (selectedPostIds.size === initialPosts.length) {
       setSelectedPostIds(new Set());
     } else {
-      setSelectedPostIds(new Set(posts.map((p) => p.id)));
+      setSelectedPostIds(new Set(initialPosts.map((p) => p.id)));
     }
-  }, [posts, selectedPostIds]);
+  }, [initialPosts, selectedPostIds]);
 
   const handleShiftDates = useCallback(
     async (days: number) => {
       if (selectedPostIds.size === 0) return;
 
-      const conflicts = detectDateConflicts(posts, selectedPostIds, days);
+      const conflicts = detectDateConflicts(initialPosts, selectedPostIds, days);
       if (conflicts.length > 0) {
         setError(
           `${conflicts.length} ta post boshqa postlar bilan bir sanaga tushib qoladi. Boshqa kun sonini tanlang.`
@@ -70,7 +65,7 @@ export default function CalendarView({ initialPosts, planId }: CalendarViewProps
       setError(null);
       router.refresh();
     },
-    [selectedPostIds, posts, router]
+    [selectedPostIds, initialPosts, router]
   );
 
   const handleChangeStatus = useCallback(
@@ -91,7 +86,7 @@ export default function CalendarView({ initialPosts, planId }: CalendarViewProps
   );
 
   const postsByDate = new Map<string, PlanPostRow[]>();
-  posts.forEach((post) => {
+  initialPosts.forEach((post) => {
     const key = post.date;
     if (!postsByDate.has(key)) {
       postsByDate.set(key, []);
@@ -177,7 +172,7 @@ export default function CalendarView({ initialPosts, planId }: CalendarViewProps
 
       <BulkActionsBar
         selectedCount={selectedPostIds.size}
-        totalCount={posts.length}
+        totalCount={initialPosts.length}
         onSelectAll={handleSelectAll}
         onShiftDates={handleShiftDates}
         onChangeStatus={handleChangeStatus}

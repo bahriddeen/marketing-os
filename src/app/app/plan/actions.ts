@@ -80,7 +80,7 @@ export async function bulkShiftDates(
 ): Promise<{ ok: true; updated: number } | { ok: false; error: string }> {
   const parsed = BulkShiftDatesSchema.safeParse({ ids, days });
   if (!parsed.success) {
-    return { ok: false, error: "Noto'g'ri so'rov." };
+    return { ok: false, error: "Noto‘g‘ri so‘rov." };
   }
 
   const supabase = await createClient();
@@ -109,7 +109,7 @@ export async function bulkShiftDates(
     .select("id");
 
   if (updateError) {
-    return { ok: false, error: "Saqlab bo'lmadi. Qayta urinib ko'ring." };
+    return { ok: false, error: "Saqlab bo‘lmadi. Qayta urinib ko‘ring." };
   }
 
   revalidatePath("/app/plan");
