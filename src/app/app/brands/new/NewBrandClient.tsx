@@ -43,22 +43,22 @@ export default function NewBrandClient() {
   return (
     <div className="max-w-4xl space-y-8">
       <Card className="space-y-3">
-        <h2 className="font-semibold text-ink">Sun‘iy intellekt bilan to‘ldirish</h2>
+        <h2 className="font-semibold text-ink">Sun’iy intellekt bilan to’ldirish</h2>
         <p className="text-sm text-muted">
-          Kompaniyangiz haqida erkin yozing — Sun‘iy intellekt formani o‘zi to‘ldiradi.
+          Kompaniyangiz haqida erkin yozing — Sun’iy intellekt formani o’zi to’ldiradi.
         </p>
         <Textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={4}
-          placeholder="Masalan: Vetline — Toshkentdagi veterinariya klinikasi. Uy hayvonlari uchun 24/7 xizmat..."
+          placeholder="Masalan: Sweet House - Toshkentdagi shirinlik do’koni. Tortlar, pishiriqlar va desertlar tayyorlaymiz. Buyurtmalarni yetkazib berish xizmati mavjud..."
         />
         {error && <p className="text-sm text-danger">{error}</p>}
         <Button
           onClick={handleFill}
           disabled={loading || description.trim().length < 30}
         >
-          {loading ? "To‘ldirilmoqda…" : "Sun‘iy intellekt bilan to‘ldirish"}
+          {loading ? "To’ldirilmoqda…" : "Sun’iy intellekt bilan to’ldirish"}
         </Button>
         <GeneratingCard active={loading} messages={BRAND_FILL_STATUS_MESSAGES} />
       </Card>
