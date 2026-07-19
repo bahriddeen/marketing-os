@@ -5,14 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase/client";
 import { MessageThread } from "@/components/chat/MessageThread";
 import { ChatInput } from "@/components/chat/ChatInput";
+import type { ChatMessage } from "@/components/chat/types";
 import Link from "next/link";
-
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  created_at: string;
-}
 
 type ChatConversationRow = {
   id: string;
@@ -35,11 +29,10 @@ export default function ConversationPage() {
   const supabase = createBrowserClient();
 
   const [conversation, setConversation] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [creditsLeft, setCreditsLeft] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isReadOnly, setIsReadOnly] = useState(false);
-  const [isLoadingResponse, setIsLoadingResponse] = useState(false);
 
   useEffect(() => {
     const loadConversation = async () => {
@@ -97,58 +90,46 @@ export default function ConversationPage() {
     loadConversation();
   }, [conversationId, supabase, router]);
 
-  const handleMessageSent = (userMessage: string, response: string, newCreditsLeft: number) => {
-    const now = new Date().toISOString();
-    const userMessageId = `tmp-user-${Date.now()}`;
-    const assistantMessageId = `tmp-assistant-${Date.now()}`;
+  const refreshMessages = async () => {
+    const { data: msgs } = await supabase
+      .from("chat_messages")
+      .select("id, role, content, created_at")
+      .eq("conversation_id", conversationId)
+      .order("created_at", { ascending: true });
+    if (msgs) setMessages(msgs);
+  };
 
-    // Add optimistic messages with actual user message content
+  const handleStreamStart = (userMessage: string) => {
+    const now = new Date().toISOString();
     setMessages((prev) => [
       ...prev,
-      { id: userMessageId, role: "user", content: userMessage, created_at: now },
-      {
-        id: assistantMessageId,
-        role: "assistant",
-        content: response,
-        created_at: now,
-      },
+      { id: `tmp-user-${Date.now()}`, role: "user", content: userMessage, created_at: now },
+      { id: `tmp-assistant-${Date.now()}`, role: "assistant", content: "", created_at: now, streaming: true },
     ]);
+  };
+
+  const handleDelta = (text: string) => {
+    setMessages((prev) => {
+      const idx = prev.findLastIndex((m) => m.streaming);
+      if (idx === -1) return prev;
+      const updated = [...prev];
+      updated[idx] = { ...updated[idx], content: updated[idx].content + text };
+      return updated;
+    });
+  };
+
+  const handleDone = (newCreditsLeft: number) => {
     setCreditsLeft(newCreditsLeft);
-    setIsLoadingResponse(true);
+    // The server has already committed the assistant message by the time
+    // `done` arrives, so one direct fetch is enough — no retry/backoff needed.
+    refreshMessages();
+  };
 
-    // Retry logic to reload messages with exponential backoff
-    const retryLoad = async (attempt = 0) => {
-      const delays = [300, 600, 1200];
-      if (attempt > 0) {
-        await new Promise((resolve) => setTimeout(resolve, delays[attempt - 1]));
-      }
-
-      const { data: msgs } = await supabase
-        .from("chat_messages")
-        .select("id, role, content, created_at")
-        .eq("conversation_id", conversationId)
-        .order("created_at", { ascending: true });
-
-      if (msgs && msgs.length > 0) {
-        // Check if we have the messages we just sent
-        const hasUserMsg = msgs.some((m) => m.role === "user" && m.content === userMessage);
-        if (hasUserMsg) {
-          setMessages(msgs);
-          setIsLoadingResponse(false);
-          return;
-        }
-      }
-
-      // Retry if we haven't found the messages yet and haven't exceeded max retries
-      if (attempt < 2) {
-        retryLoad(attempt + 1);
-      } else {
-        // Give up after 3 attempts, use optimistic messages
-        setIsLoadingResponse(false);
-      }
-    };
-
-    retryLoad();
+  const handleStreamError = () => {
+    // ChatInput already shows the error banner itself; here we just drop the
+    // unfinished assistant placeholder. The user's message is unaffected —
+    // it was already persisted server-side before generation started.
+    setMessages((prev) => prev.filter((m) => !m.streaming));
   };
 
   const handleDelete = async () => {
@@ -193,17 +174,17 @@ export default function ConversationPage() {
       </div>
 
       {/* Messages */}
-      <MessageThread
-        messages={messages}
-        isLoading={isLoadingResponse}
-      />
+      <MessageThread messages={messages} />
 
       {/* Input */}
       <ChatInput
         conversationId={conversationId}
         creditsLeft={creditsLeft}
         isReadOnly={isReadOnly}
-        onMessageSent={handleMessageSent}
+        onStreamStart={handleStreamStart}
+        onDelta={handleDelta}
+        onDone={handleDone}
+        onStreamError={handleStreamError}
       />
 
       {/* Back link */}
