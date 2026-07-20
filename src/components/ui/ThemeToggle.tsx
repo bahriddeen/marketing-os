@@ -1,32 +1,30 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Sun, Moon, Monitor } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 
-type Theme = "light" | "dark" | "system";
+type Theme = "light" | "dark";
 
 const OPTIONS: { value: Theme; icon: typeof Sun; label: string }[] = [
   { value: "light", icon: Sun, label: "Yorug‘ mavzu" },
   { value: "dark", icon: Moon, label: "Tungi mavzu" },
-  { value: "system", icon: Monitor, label: "Tizim mavzusi" },
 ];
 
 function applyTheme(theme: Theme) {
-  if (theme === "system") {
-    delete document.documentElement.dataset.theme;
-    localStorage.removeItem("theme");
-  } else {
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem("theme", theme);
-  }
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem("theme", theme);
 }
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("system");
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
     const stored = localStorage.getItem("theme");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (stored === "light" || stored === "dark") setTheme(stored);
+    if (stored === "light" || stored === "dark") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTheme(stored);
+    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      setTheme("dark");
+    }
   }, []);
 
   function handleSelect(value: Theme) {

@@ -47,7 +47,6 @@ export default function Sidebar({ credits }: { credits: number }) {
       </nav>
       <div className="flex items-center gap-3 md:mt-auto md:flex-col md:items-stretch md:gap-3 md:pt-4">
         <div className="flex items-center gap-2 md:self-start">
-          <ThemeToggle />
           <Link
             href="/app/upgrade"
             aria-label="Tarif"
@@ -60,6 +59,7 @@ export default function Sidebar({ credits }: { credits: number }) {
             <CreditCard size={18} strokeWidth={1.75} />
             <span className="hidden md:inline">Tarif</span>
           </Link>
+          <ThemeToggle />
         </div>
         <div className="hidden rounded-[0.625rem] bg-canvas px-3 py-2.5 md:block">
           <p className="text-xs text-muted">Kreditlar</p>
