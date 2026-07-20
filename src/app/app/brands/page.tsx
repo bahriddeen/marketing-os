@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getOrCreateWorkspace } from "@/lib/workspace";
-import { deleteBrand } from "./actions";
+import DeleteBrandButton from "./DeleteBrandButton";
 import type { Brand } from "@/lib/types";
 import Link from "next/link";
 import Card from "@/components/ui/Card";
@@ -49,12 +49,7 @@ export default async function BrandsPage() {
               >
                 Tahrirlash
               </Link>
-              <form action={deleteBrand}>
-                <input type="hidden" name="id" value={b.id} />
-                <button className="font-medium text-danger hover:underline">
-                  O‘chirish
-                </button>
-              </form>
+              <DeleteBrandButton brandId={b.id} />
             </div>
           </Card>
         ))}

@@ -1,4 +1,5 @@
 "use server";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { getOrCreateWorkspace } from "@/lib/workspace";
 import { redirect } from "next/navigation";
@@ -35,9 +36,27 @@ export async function saveBrand(formData: FormData) {
   redirect("/app/brands");
 }
 
-export async function deleteBrand(formData: FormData) {
+export async function deleteBrand(
+  brandId: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!z.string().uuid().safeParse(brandId).success) {
+    return { ok: false, error: "Brend topilmadi." };
+  }
+
   const supabase = await createClient();
-  await supabase.from("brands").delete().eq("id", String(formData.get("id")));
+  const { data, error } = await supabase
+    .from("brands")
+    .delete()
+    .eq("id", brandId)
+    .select("id")
+    .maybeSingle();
+  if (error) {
+    return { ok: false, error: "O‘chirib bo‘lmadi. Qayta urinib ko‘ring." };
+  }
+  if (!data) {
+    return { ok: false, error: "Brend topilmadi." };
+  }
+
   revalidatePath("/app/brands");
-  redirect("/app/brands");
+  return { ok: true };
 }
