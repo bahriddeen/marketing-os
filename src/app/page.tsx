@@ -4,29 +4,17 @@ import { createClient } from "@/lib/supabase/server";
 import HeroPreview from "@/components/marketing/HeroPreview";
 import Button from "@/components/ui/Button";
 import { BeamsBackground } from "@/components/ui/BeamsBackground";
-import { BookOpen, Calendar, Clapperboard, PenLine } from "lucide-react";
-
-const MODULES = [
-  {
-    title: "Brend bilimlar bazasi",
-    body: "Kompaniyangiz haqida bir marta yozing — mahsulotlar, auditoriya, ohang. Sun‘iy intellekt keyingi barcha generatsiyalarda shu ma‘lumotni ishlatadi, qayta tushuntirishga hojat yo‘q.",
-  },
-  {
-    title: "Kontent reja",
-    body: "Instagram va Telegram uchun oylik kontent rejasini bir necha daqiqada oling — maqsad va formatga mos, tayyor sarlavhalar bilan.",
-  },
-  {
-    title: "Reels generatori",
-    body: "Ssenariy, boshlanish jumlasi va ovoz ohangi — reels uchun tayyor g‘oyalar, brendingiz uslubida.",
-  },
-  {
-    title: "Kopiraiting",
-    body: "Post, reklama matni yoki SMS — formatga mos, sotuvga yo‘naltirilgan matnlarni soniyalarda yarating.",
-  },
-];
+import {
+  BookOpen,
+  Calendar,
+  Clapperboard,
+  MessageCircle,
+  PenLine,
+} from "lucide-react";
 
 const MODULE_ROW = [
   { label: "Bilimlar bazasi", Icon: BookOpen },
+  { label: "Suhbat", Icon: MessageCircle },
   { label: "Kontent reja", Icon: Calendar },
   { label: "Reels", Icon: Clapperboard },
   { label: "Kopiraiting", Icon: PenLine },
@@ -61,13 +49,12 @@ export default async function LandingPage() {
       <main className="mx-auto w-full max-w-5xl flex-1 px-6">
         <section className="py-16 text-center md:py-24">
           <h1 className="mx-auto max-w-3xl font-display text-[2.75rem] font-bold leading-[1.05] tracking-[-0.02em] text-ink sm:text-[4rem] md:text-[4.5rem]">
-            Brendingiz haqida yozing — tayyor kontentni{" "}
-            <span className="text-accent">sun‘iy intellekt</span> yozadi.
+            Brendingizga mos kontentni{" "}
+            <span className="text-accent">daqiqalar ichida</span> tayyorlang.
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted">
-            O‘zbek marketing va SMM mutaxassislari uchun — brend
-            ma‘lumotidan Instagram va Telegram‘ga tayyor post, reels
-            ssenariysi va reklama matni.
+            Instagram va Telegram uchun post, reels ssenariysi va reklama
+            matni — brend ma‘lumotingiz asosida, soniyalarda.
           </p>
           <div className="mt-8 flex justify-center">
             <Link href="/signup">
@@ -88,17 +75,6 @@ export default async function LandingPage() {
             ))}
           </div>
           <HeroPreview />
-        </section>
-
-        <section className="grid gap-8 border-t border-line py-16 sm:grid-cols-2">
-          {MODULES.map((m) => (
-            <div key={m.title}>
-              <h2 className="font-display text-xl font-semibold text-ink">
-                {m.title}
-              </h2>
-              <p className="mt-2 leading-relaxed text-muted">{m.body}</p>
-            </div>
-          ))}
         </section>
       </main>
 
